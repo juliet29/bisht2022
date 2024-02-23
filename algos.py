@@ -1,6 +1,8 @@
 import networkx as nx
 from icecream import ic
 
+# algo based on Bisht 2022
+
 # plots and utilities 
 
 def plot_planar_embed(embed: nx.PlanarEmbedding):
@@ -96,6 +98,23 @@ def graph_from_edges(edges):
     G = nx.Graph()
     G.add_edges_from(edges)
     return G
+
+def st_graph():
+    order_a = 4
+    order_b = 4
+    G_a = nx.random_regular_graph(3, order_a)
+    G_b = nx.random_regular_graph(2, order_b)
+
+    node_names = [order_a + i for i in range(order_b)]
+    mapping = {old_label: new_label for old_label, new_label in zip(G_b.nodes(), node_names)}
+    G_b = nx.relabel_nodes(G_b, mapping)
+
+    # connect graphs 
+    G  = nx.union(G_a, G_b)
+    G.add_edge(list(G_a.nodes)[0], node_names[-1])
+
+    return G
+
 
 def square_tri_graph():
     G = nx.Graph()
