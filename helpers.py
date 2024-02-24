@@ -1,8 +1,13 @@
 import networkx as nx
 from icecream import ic
 
+import numpy as np
+import matplotlib.pyplot as plt
 
-# plots and utilities 
+from scipy.spatial import ConvexHull
+
+
+# plots  
 
 def plot_planar_embed(embed: nx.PlanarEmbedding):
     pos = nx.combinatorial_embedding_to_pos(embed)
@@ -15,21 +20,6 @@ def plot_just_planar(G: nx.Graph):
         nx.draw_networkx(G, pos)
     except:
         nx.draw_networkx(G)
-
-
-def find_difference(list1, list2):
-    set1 = set(list1)
-    set2 = set(list2)
-    
-    # Find the elements present in set1 but not in set2
-    difference1 = set1 - set2
-    
-    # Find the elements present in set2 but not in set1
-    difference2 = set2 - set1
-    
-    return difference1, difference2
-
-
 
 
 ## special starting graphs 
@@ -75,3 +65,75 @@ def square_tri_graph():
     G.add_edge(1, 5)  # Connect a node from the square to a node from the triangle
 
     return G
+
+
+# utilities
+
+def find_difference(list1, list2):
+    set1 = set(list1)
+    set2 = set(list2)
+    
+    # Find the elements present in set1 but not in set2
+    difference1 = set1 - set2
+    
+    # Find the elements present in set2 but not in set1
+    difference2 = set2 - set1
+    
+    return difference1, difference2
+
+def line_through_points(point_pair):
+    point1, point2 = point_pair
+    x1, y1 = point1
+    x2, y2 = point2
+
+    # Calculate slope
+    slope = (y2 - y1) / (x2 - x1)
+
+    # Use one of the points to find y-intercept
+    b = y1 - slope * x1
+
+    return slope, b
+
+def point_on_line(line_data, test_point):
+    # skipping coincident check => getting those points from the convex hull calc. here looking for inbetween points 
+    slope, b = line_data
+    x, y = test_point
+
+    expected_y = slope*x + b
+    return np.isclose(y, expected_y)
+
+def extract_convex_points(embed_arr, hull):
+    boundary_points = []
+    for simplex in hull.simplices:
+        boundary_points.append((embed_arr[simplex[0]], embed_arr[simplex[1]]))
+    return boundary_points
+
+def find_boundary_points(G):
+    # find planar embedding -> for network x, this will arrange points in triangular fashion 
+    embed =  nx.planar_layout(G)
+    embed_arr = np.array([embed[key] for key in sorted(embed.keys())])
+    indices = np.arange(len(embed_arr))
+    
+    # find convex hull 
+    hull = ConvexHull(embed_arr)
+
+    known_boundary_ix = np.unique(hull.simplices)
+    test_ix  = set(indices) - set(known_boundary_ix) # todo naming may be weird => points are all represented by their index  
+
+    hull_pairs = extract_convex_points(embed_arr, hull)
+
+    for pair in hull_pairs:
+        l = line_through_points(pair)
+        # check if point on line. 
+        for ix in test_ix:
+            if point_on_line(l, embed_arr[ix]):
+                # ic("point!", ix)
+                known_boundary_ix = np.append(known_boundary_ix, ix)
+                # ic(known_boundary_ix)
+                test_ix  = set(indices) - set(known_boundary_ix)
+    
+    boundary_points = embed_arr[known_boundary_ix]
+    return boundary_points, known_boundary_ix
+
+
+

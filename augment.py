@@ -55,7 +55,8 @@ class Augment:
                     ic(next_item, next_block_members)
                 if not set(curr_block) & set(next_block):
                     edge = (curr_item, next_item)
-                    ic(f"No overlap between {edge}. Adding edge")
+                    if LOCAL_DEBUG:
+                        ic(f"No overlap between {edge}. Adding edge")
                     # add edges between vertices 
                     self.G_biconnect.add_edge(curr_item, next_item)
             # TODO add the part to make minimal additions.. 
@@ -78,5 +79,6 @@ class Augment:
         l3_cycles = sorted(nx.simple_cycles(self.G_tri, 3))
         m = len(list(self.G_tri.edges))
         n = len(list(self.G_tri.nodes))
-        ic(len(l3_cycles), m, n, m-n+1);
+        if self.DEBUG:
+            ic(len(l3_cycles), m, n, m-n+1);
         assert len(l3_cycles) == m-n+1    

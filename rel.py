@@ -9,7 +9,7 @@ class REL:
 
     def augment(self):
         a = Augment(self.G_start)
-        a.run_augment(DEBUG=True)
+        a.run_augment(DEBUG=False)
         self.G = a.G_final
         return self.G
 
