@@ -132,8 +132,9 @@ def find_boundary_points(G):
                 # ic(known_boundary_ix)
                 test_ix  = set(indices) - set(known_boundary_ix)
     
-    boundary_points = embed_arr[known_boundary_ix]
-    return boundary_points, known_boundary_ix
+    boundary_locations = embed_arr[known_boundary_ix]
+    boundary_nodes = [i + 1 for i in known_boundary_ix]
+    return boundary_locations, boundary_nodes
 
 
 
