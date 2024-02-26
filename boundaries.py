@@ -9,7 +9,7 @@ class Boundaries:
         pass
 
     def find_boundary_points(self):
-
+        # todo split this up 
         # find planar embedding -> for network x, this will arrange points in triangular fashion
         self.embed = nx.planar_layout(self.G) # dictionary with node locations 
         embed_arr = np.array([self.embed[key] for key in sorted(self.embed.keys())])
@@ -30,21 +30,24 @@ class Boundaries:
             # check if point on line.
             for ix in test_ix:
                 if check_point_on_line(l, embed_arr[ix]):
-                    # ic("point!", ix)
                     known_boundary_ix = np.append(known_boundary_ix, ix)
-                    # ic(known_boundary_ix)
                     test_ix = set(indices) - set(known_boundary_ix)
 
-        self.boundary_locations = embed_arr[known_boundary_ix]
-        self.boundary_nodes = [
-            i + 1 for i in known_boundary_ix
-        ]  # nodes are indexed  1, 2, ...
-        return self.boundary_locations, self.boundary_nodes
+        # nodes are named  1, 2, ...
+        self.boundary_nodes = [i + 1 for i in known_boundary_ix]  
+        return self.boundary_nodes
 
     def find_boundary_edges(self):
         potential_b_edge = []
+        true_b_edge = []
         for pair in self.G.edges:
-            if pair[0] in self.boundary_nodes and pair[1] in self.boundary_nodes:
+            u, v = pair
+            if u in self.boundary_nodes and v in self.boundary_nodes:
                 potential_b_edge.append(pair)
-
-        # check which edges are parallel with the lines that define the convex hull => same slope..
+                # check which edges align w convex hull 
+                slope, _ = find_line_through_points((self.embed[u], self.embed[v]))
+                for hull_line in self.hull_lines:
+                    if check_parallel(hull_line[0], slope):
+                        true_b_edge.append(pair)
+                        break
+        self.shortcuts = set(potential_b_edge) - set(true_b_edge)
