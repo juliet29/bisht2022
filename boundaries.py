@@ -55,14 +55,14 @@ class Boundaries:
 
     def find_seperating_triangles(self):
         three_cyles = sorted(nx.simple_cycles(self.G, 3))
-        sep_triangles = []
+        self.sep_triangles = []
         for cycle in three_cyles:
             other_nodes = list(set(self.G.nodes) - set(cycle))
             coords = [self.embed[k] for k in cycle]
             domain = find_min_max_coordinates(coords)
 
             for node in other_nodes:
-                if check_point_in_hull(domain, self.embed[node]):
-                    sep_triangles.append(cycle)
+                if check_point_in_hull(domain, self.embed[node]) and cycle not in self.sep_triangles:
+                    self.sep_triangles.append(cycle)
 
-        return sep_triangles
+        return self.sep_triangles
