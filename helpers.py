@@ -90,7 +90,7 @@ def find_difference(list1, list2):
 
 
 def find_line_through_points(point_pair):
-    point1, point2 = point_pair # tuple of coordinate pts
+    point1, point2 = point_pair  # tuple of coordinate pts
     x1, y1 = point1
     x2, y2 = point2
 
@@ -99,7 +99,7 @@ def find_line_through_points(point_pair):
 
     # Use one of the points to find y-intercept
     b = y1 - slope * x1
-    # todo turn output into class 
+    # todo turn output into class
     return slope, b
 
 
@@ -111,6 +111,7 @@ def check_point_on_line(line_data, test_point):
     expected_y = slope * x + y_intercept
     return np.isclose(y, expected_y)
 
+
 def check_parallel(slope_1, slope_2):
     return np.isclose(slope_1, slope_2)
 
@@ -121,3 +122,29 @@ def extract_convex_points(embed_arr, hull):
     for simplex in hull.simplices:
         boundary_points.append((embed_arr[simplex[0]], embed_arr[simplex[1]]))
     return boundary_points
+
+
+def find_min_max_coordinates(coordinates):
+    if not coordinates:
+        return None
+
+    # Convert the list of arrays into a numpy array for efficient manipulation
+    coordinates_array = np.array(coordinates)
+
+    # Extract x and y coordinates into separate arrays
+    x_coords = coordinates_array[:, 0]
+    y_coords = coordinates_array[:, 1]
+
+    # Find min and max values for x and y coordinates
+    min_x = np.min(x_coords)
+    max_x = np.max(x_coords)
+    min_y = np.min(y_coords)
+    max_y = np.max(y_coords)
+
+    return (min_x, max_x), (min_y, max_y)
+
+def check_point_in_hull(domain, point):
+    x_domain, y_domain = domain
+    x,y = point
+
+    return x_domain[0] < x < x_domain[1] and y_domain[0] < y < y_domain[1]

@@ -6,12 +6,13 @@ from helpers import *
 class Boundaries:
     def __init__(self, G) -> None:
         self.G = G
+        self.embed = nx.planar_layout(self.G) # dictionary with node locations 
         pass
 
     def find_boundary_points(self):
         # todo split this up 
         # find planar embedding -> for network x, this will arrange points in triangular fashion
-        self.embed = nx.planar_layout(self.G) # dictionary with node locations 
+        
         embed_arr = np.array([self.embed[key] for key in sorted(self.embed.keys())])
         indices = np.arange(len(embed_arr))
 
@@ -50,4 +51,18 @@ class Boundaries:
                     if check_parallel(hull_line[0], slope):
                         true_b_edge.append(pair)
                         break
-        self.shortcuts = set(potential_b_edge) - set(true_b_edge)
+        self.shortcuts = list(set(potential_b_edge) - set(true_b_edge))
+
+    def find_seperating_triangles(self):
+        three_cyles = sorted(nx.simple_cycles(self.G, 3))
+        sep_triangles = []
+        for cycle in three_cyles:
+            other_nodes = list(set(self.G.nodes) - set(cycle))
+            coords = [self.embed[k] for k in cycle]
+            domain = find_min_max_coordinates(coords)
+
+            for node in other_nodes:
+                if check_point_in_hull(domain, self.embed[node]):
+                    sep_triangles.append(cycle)
+
+        return sep_triangles

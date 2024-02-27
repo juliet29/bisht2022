@@ -6,6 +6,7 @@ from helpers import *
 class Augment:
     def __init__(self, G) -> None:
         self.G = G
+        self.DEBUG = None
 
     def run_augment(self, DEBUG=False):
         self.DEBUG = DEBUG
