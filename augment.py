@@ -6,6 +6,7 @@ from helpers import *
 class Augment:
     def __init__(self, G) -> None:
         self.G = G
+        self.G_init = G
         self.G_tri = None
         self.DEBUG = None
 
@@ -19,9 +20,9 @@ class Augment:
 
         # self.seperating_triangle_check()
 
-        self.G_final = self.G_tri
+        self.G= self.G_tri
 
-        return self.G_final
+        return self.G
         
 
     def check_block(self, node, blocks):
@@ -84,7 +85,7 @@ class Augment:
         n = len(list(local_G.nodes))
         if self.DEBUG:
             ic(len(l3_cycles), m, n, m-n+1);
-        assert len(l3_cycles) == m-n+1    
+        assert len(l3_cycles) == m-n+1,   f"{len(l3_cycles), m, n, m-n+1}"  
 
 
     

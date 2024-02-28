@@ -9,15 +9,15 @@ from scipy.spatial import ConvexHull
 
 # simple classes
 
+
 class SeperatingTriangle:
-    def __init__(self, cycle:list , inner_node:int ) -> None:
+    def __init__(self, cycle: list, inner_node: int) -> None:
         self.cycle = cycle
         self.inner_node = inner_node
-        self.target_edge:tuple = None 
+        self.target_edge: tuple = None
 
     def __repr__(self):
-        return f'SeperatingTriangle({self.cycle}, {self.inner_node}, {self.target_edge})' #TODO automatically return dictionary .. 
-    
+        return f"SeperatingTriangle({self.cycle}, {self.inner_node}, {self.target_edge})"  # TODO automatically return dictionary ..
 
 
 # plots
@@ -28,12 +28,12 @@ def plot_planar_embed(embed: nx.PlanarEmbedding):
 
 def plot_just_planar(G: nx.Graph, pos=None):
     try:
-        ic("planar")
         if not pos:
             pos = nx.planar_layout(G)
         nx.draw_networkx(G, pos)
-        return pos 
+        return pos
     except:
+        ic("not planar")
         nx.draw_networkx(G)
 
 
@@ -156,8 +156,34 @@ def find_min_max_coordinates(coordinates):
 
     return (min_x, max_x), (min_y, max_y)
 
+
 def check_point_in_hull(domain, point):
     x_domain, y_domain = domain
-    x,y = point
+    x, y = point
 
     return x_domain[0] < x < x_domain[1] and y_domain[0] < y < y_domain[1]
+
+
+def new_node_pos(pos, n1, n2):
+    # assuming point will be on edge between two nodes
+    print(n1)
+    n1_x = n1[0]
+    n2_x = n2[0]
+
+    n1_y = n1[1]
+    n2_y = n2[1]
+
+    if np.isclose(n1_x, n2_x):
+        ic("same x", n1_x, n2_x)
+        n_x = n1_x
+        n_y = np.mean([n1_y, n2_y])
+    elif np.isclose(n1_y, n2_y):
+        ic("same y", n1_y, n2_y)
+        n_x = np.mean([n1_x, n2_x])
+        n_y = n1_y
+    else:
+        ic("neither same")
+        n_x = np.mean([n1_x, n2_x])
+        n_y = np.mean([n1_y, n2_y])
+
+    return (n_x, n_y)
