@@ -1,4 +1,5 @@
 from helpers import *
+import random
 
 ## NOTE: keeping this seperate from augment.py class, bc could possibly want to get boundary at anyy stage of the augmentation, but could put togetehr later ..
 
@@ -10,18 +11,13 @@ class Boundaries:
         pass
 
     def find_boundary_points(self):
-        # todo split this up 
-        # find planar embedding -> for network x, this will arrange points in triangular fashion
-        
         embed_arr = np.array([self.embed[key] for key in sorted(self.embed.keys())])
         indices = np.arange(len(embed_arr))
 
-        # find convex hull
         hull = ConvexHull(embed_arr)
 
         known_boundary_ix = np.unique(hull.simplices)
         test_ix = set(indices) - set(known_boundary_ix)
-
         hull_pairs = extract_convex_points(embed_arr, hull)
 
         self.hull_lines = [] 
@@ -53,16 +49,44 @@ class Boundaries:
                         break
         self.shortcuts = list(set(potential_b_edge) - set(true_b_edge))
 
+    # TODO this may be its own class..
+
     def find_seperating_triangles(self):
         three_cyles = sorted(nx.simple_cycles(self.G, 3))
         self.sep_triangles = []
-        for cycle in three_cyles:
+        for ix, cycle in enumerate(three_cyles):
             other_nodes = list(set(self.G.nodes) - set(cycle))
             coords = [self.embed[k] for k in cycle]
             domain = find_min_max_coordinates(coords)
 
             for node in other_nodes:
-                if check_point_in_hull(domain, self.embed[node]) and cycle not in self.sep_triangles:
-                    self.sep_triangles.append(cycle)
+                if check_point_in_hull(domain, self.embed[node]) and cycle not in self.sep_triangles: # TODO double check for nested triangles.. 
+                    self.sep_triangles.append(SeperatingTriangle(cycle, node))
 
         return self.sep_triangles
+    
+    def find_sep_triangle_targets(self):
+        st_edges = [list(self.G.subgraph(tri.cycle).edges) for tri in self.sep_triangles] # [[ei1, ei2, ei3], ... , [ep1, ep2, ep3]] p = num of sep triangles
+
+        # will find a set of less than k edges that are needed to solve st problem  => here setting to n 
+        edges = list(self.G.edges())
+        k = len(edges)
+        random.shuffle(edges)
+        random_graph_edges = edges[:k]
+
+        covered_bools = [] 
+        target_edges = []
+
+        for ix, tri in enumerate(st_edges):
+            covered_bools.append(False)
+            for edge in random_graph_edges:
+                if edge in tri:
+                    target_edges.append(edge)
+                    covered_bools[ix] = True
+                    break
+            # check that each st was covered
+            assert covered_bools[ix] == True    
+
+        return target_edges  
+
+

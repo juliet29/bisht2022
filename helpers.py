@@ -7,9 +7,19 @@ import matplotlib.pyplot as plt
 from scipy.spatial import ConvexHull
 
 
+# simple classes
+
+class SeperatingTriangle:
+    def __init__(self, cycle:list , inner_node:int ) -> None:
+        self.cycle = cycle
+        self.inner_node = inner_node
+
+    def __repr__(self):
+        return f'SeperatingTriangle({self.cycle}, {self.inner_node})'
+    
+
+
 # plots
-
-
 def plot_planar_embed(embed: nx.PlanarEmbedding):
     pos = nx.combinatorial_embedding_to_pos(embed)
     nx.draw_networkx(nx.Graph(embed), pos)
