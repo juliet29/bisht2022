@@ -6,6 +6,7 @@ from helpers import *
 class Augment:
     def __init__(self, G) -> None:
         self.G = G
+        self.G_tri = None
         self.DEBUG = None
 
     def run_augment(self, DEBUG=False):
@@ -76,10 +77,11 @@ class Augment:
     def test_triangulate(self):
         assert nx.is_chordal(self.G_tri)
         
-    def seperating_triangle_check(self):
-        l3_cycles = sorted(nx.simple_cycles(self.G_tri, 3))
-        m = len(list(self.G_tri.edges))
-        n = len(list(self.G_tri.nodes))
+    def seperating_triangle_check(self, G=None):
+        local_G = G if G else self.G_tri
+        l3_cycles = sorted(nx.simple_cycles(local_G, 3))
+        m = len(list(local_G.edges))
+        n = len(list(local_G.nodes))
         if self.DEBUG:
             ic(len(l3_cycles), m, n, m-n+1);
         assert len(l3_cycles) == m-n+1    

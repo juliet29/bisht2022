@@ -60,13 +60,15 @@ class Boundaries:
             domain = find_min_max_coordinates(coords)
 
             for node in other_nodes:
-                if check_point_in_hull(domain, self.embed[node]) and cycle not in self.sep_triangles: # TODO double check for nested triangles.. 
+                # TODO double check for nested triangles.. 
+                if check_point_in_hull(domain, self.embed[node]) and cycle not in self.sep_triangles: 
                     self.sep_triangles.append(SeperatingTriangle(cycle, node))
 
         return self.sep_triangles
     
     def find_sep_triangle_targets(self):
-        st_edges = [list(self.G.subgraph(tri.cycle).edges) for tri in self.sep_triangles] # [[ei1, ei2, ei3], ... , [ep1, ep2, ep3]] p = num of sep triangles
+        # [[ei1, ei2, ei3], ... , [ep1, ep2, ep3]], p = num of sep triangles
+        st_edges = [list(self.G.subgraph(tri.cycle).edges) for tri in self.sep_triangles] 
 
         # will find a set of less than k edges that are needed to solve st problem  => here setting to n 
         edges = list(self.G.edges())
@@ -75,18 +77,38 @@ class Boundaries:
         random_graph_edges = edges[:k]
 
         covered_bools = [] 
-        target_edges = []
+        # self.target_edges = []
 
-        for ix, tri in enumerate(st_edges):
+        for ix, tri in enumerate(self.sep_triangles):
             covered_bools.append(False)
             for edge in random_graph_edges:
-                if edge in tri:
-                    target_edges.append(edge)
+                if edge in st_edges[ix]:
+                    tri.target_edge = edge
                     covered_bools[ix] = True
                     break
             # check that each st was covered
             assert covered_bools[ix] == True    
+ 
+        return self.sep_triangles 
+    
+    def clean_up_sep_triangle(self):
+        self.G_nost = self.G.copy() # no sep triangle 
+        for ix, tri in enumerate(self.sep_triangles):
+            new_node = len(self.G.nodes) + ix 
+            ic(ix, new_node, len(self.G.nodes))
+            n1, n2 = tri.target_edge
+            ic(tri.target_edge)
+            new_edges = [(n1, new_node), (n2, new_node), (tri.inner_node, new_node)]
 
-        return target_edges  
+            self.G_nost.remove_edge(n1, n2)
+            self.G_nost.add_edges_from(new_edges)
+
+        return self.G_nost
+
+
+            
+
+
+
 
 

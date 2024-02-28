@@ -13,9 +13,10 @@ class SeperatingTriangle:
     def __init__(self, cycle:list , inner_node:int ) -> None:
         self.cycle = cycle
         self.inner_node = inner_node
+        self.target_edge:tuple = None 
 
     def __repr__(self):
-        return f'SeperatingTriangle({self.cycle}, {self.inner_node})'
+        return f'SeperatingTriangle({self.cycle}, {self.inner_node}, {self.target_edge})' #TODO automatically return dictionary .. 
     
 
 
@@ -25,11 +26,13 @@ def plot_planar_embed(embed: nx.PlanarEmbedding):
     nx.draw_networkx(nx.Graph(embed), pos)
 
 
-def plot_just_planar(G: nx.Graph):
+def plot_just_planar(G: nx.Graph, pos=None):
     try:
         ic("planar")
-        pos = nx.planar_layout(G)
+        if not pos:
+            pos = nx.planar_layout(G)
         nx.draw_networkx(G, pos)
+        return pos 
     except:
         nx.draw_networkx(G)
 
