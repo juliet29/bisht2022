@@ -17,7 +17,7 @@ class Augment:
         self.triangulate()
         self.test_triangulate()
 
-        self.seperating_triangle_check()
+        # self.seperating_triangle_check()
 
         self.G_final = self.G_tri
 
