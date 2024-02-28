@@ -20,7 +20,7 @@ class Augment:
 
         # self.seperating_triangle_check()
 
-        self.G= self.G_tri
+        self.G = self.G_tri
 
         return self.G
         
@@ -78,14 +78,7 @@ class Augment:
     def test_triangulate(self):
         assert nx.is_chordal(self.G_tri)
         
-    def seperating_triangle_check(self, G=None):
-        local_G = G if G else self.G_tri
-        l3_cycles = sorted(nx.simple_cycles(local_G, 3))
-        m = len(list(local_G.edges))
-        n = len(list(local_G.nodes))
-        if self.DEBUG:
-            ic(len(l3_cycles), m, n, m-n+1);
-        assert len(l3_cycles) == m-n+1,   f"{len(l3_cycles), m, n, m-n+1}"  
+    
 
 
     

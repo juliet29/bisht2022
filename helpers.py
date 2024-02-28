@@ -25,6 +25,11 @@ def plot_planar_embed(embed: nx.PlanarEmbedding):
     pos = nx.combinatorial_embedding_to_pos(embed)
     nx.draw_networkx(nx.Graph(embed), pos)
 
+def plot_planar(G, old_pos=None):
+    # ic(old_pos)
+    pos = old_pos if old_pos else nx.planar_layout(G)
+    pos = nx.draw_networkx(G, pos)
+    return pos
 
 def plot_just_planar(G: nx.Graph, pos=None):
     try:
@@ -164,9 +169,8 @@ def check_point_in_hull(domain, point):
     return x_domain[0] < x < x_domain[1] and y_domain[0] < y < y_domain[1]
 
 
-def new_node_pos(pos, n1, n2):
+def new_node_pos(n1, n2):
     # assuming point will be on edge between two nodes
-    print(n1)
     n1_x = n1[0]
     n2_x = n2[0]
 
