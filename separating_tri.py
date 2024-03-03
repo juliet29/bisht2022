@@ -15,6 +15,8 @@ class FixSeparatingTriangles:
         self.find_targets()
         self.remove_st()
 
+        self.seperating_triangle_check()
+
         return self.G_no_st
 
     def find_st(self):

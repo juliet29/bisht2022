@@ -92,7 +92,8 @@ def square_tri_graph():
 
 
 # utilities
-
+def total_length(list_of_lists):
+    return sum(len(sublist) for sublist in list_of_lists)
 
 def find_difference(list1, list2):
     set1 = set(list1)

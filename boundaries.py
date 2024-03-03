@@ -33,7 +33,7 @@ class Boundaries:
                     test_ix = set(indices) - set(known_boundary_ix)
 
         # nodes are named  1, 2, ...
-        self.boundary_nodes = known_boundary_ix #[i  for i in known_boundary_ix]
+        self.boundary_nodes = known_boundary_ix 
         return self.boundary_nodes
 
     def find_boundary_edges(self):
@@ -53,6 +53,18 @@ class Boundaries:
         self.boundary_edges = true_b_edge
         self.shortcuts = list(set(potential_b_edge) - set(true_b_edge))
 
+    def find_cips(self):
+        # corner implying paths: len > 3, 
+        self.cips = []
+        self.boundary_graph = nx.subgraph(self.G, self.boundary_nodes)
+        shortcut_ends = np.unique(self.shortcuts)
+
+        for shortcut in self.shortcuts:
+            for path in nx.all_simple_paths(self.boundary_graph, shortcut[0], shortcut[1]):
+                if not set(shortcut_ends).intersection(path[1:-1]) and len(path) >=3:
+                    self.cips.append(path)
+
+        assert len(self.cips) <= 4, "More than 4 corner implying paths"
 
 
 
