@@ -105,7 +105,9 @@ class Boundaries:
     
     def four_connect(self):
         # TODO treatment for when n verts < 4 
-        pass
+        # For now assume n verts > 4 
+        embed_domain = find_min_max_coordinates(list(self.embed.values()))
+ 
         # create nodes and position them 
         # s < y_min, and centered in x (need hull points)
         # n > y_max 

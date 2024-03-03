@@ -17,7 +17,17 @@ class SeperatingTriangle:
         self.target_edge: tuple = None
 
     def __repr__(self):
-        return f"SeperatingTriangle({self.cycle}, {self.inner_node}, {self.target_edge})"  # TODO automatically return dictionary ..
+        return f"SeperatingTriangle({self.__dict__})" 
+    
+class Domain:
+    def __init__(self, x_min: int, x_max: int, y_min: int, y_max: int) -> None:
+        self.x_min = x_min
+        self.x_max = x_max
+        self.y_min = y_min
+        self.y_max = y_max
+
+    def __repr__(self):
+        return f"Domain({self.__dict__})" 
 
 
 # plots
@@ -154,20 +164,20 @@ def find_min_max_coordinates(coordinates):
     x_coords = coordinates_array[:, 0]
     y_coords = coordinates_array[:, 1]
 
+
     # Find min and max values for x and y coordinates
-    min_x = np.min(x_coords)
-    max_x = np.max(x_coords)
-    min_y = np.min(y_coords)
-    max_y = np.max(y_coords)
+    d = Domain(x_min=np.min(x_coords), 
+               x_max=np.max(x_coords), 
+               y_min=np.min(y_coords),
+               y_max=np.max(y_coords))
 
-    return (min_x, max_x), (min_y, max_y)
+    return d
 
 
-def check_point_in_hull(domain, point):
-    x_domain, y_domain = domain
+def check_point_in_hull(domain: Domain, point):
     x, y = point
-
-    return x_domain[0] < x < x_domain[1] and y_domain[0] < y < y_domain[1]
+    
+    return domain.x_min < x < domain.x_max and domain.y_min < y < domain.y_max
 
 
 def new_node_pos(n1, n2):
