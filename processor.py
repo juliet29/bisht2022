@@ -27,9 +27,15 @@ class Processor:
         self.embed = self.s.embed
 
 
-    def fix_cips(self):
+    def find_cips(self):
         self.b = Boundaries(self.G, self.embed)
         self.b.find_cips()
+        # TODO fix if needed ...
+
+    def start_four_connect(self):
+        self.b.organize_cips()
+        self.b.distribute_boundary_nodes()
+        
 
 
         

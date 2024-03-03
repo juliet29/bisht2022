@@ -35,6 +35,7 @@ class Boundaries:
         # nodes are named  1, 2, ...
         self.boundary_nodes = known_boundary_ix 
         return self.boundary_nodes
+    
 
     def find_boundary_edges(self):
         potential_b_edge = []
@@ -53,6 +54,7 @@ class Boundaries:
         self.boundary_edges = true_b_edge
         self.shortcuts = list(set(potential_b_edge) - set(true_b_edge))
 
+
     def find_cips(self):
         # corner implying paths: len > 3, 
         self.cips = []
@@ -65,6 +67,52 @@ class Boundaries:
                     self.cips.append(path)
 
         assert len(self.cips) <= 4, "More than 4 corner implying paths"
+
+
+    def organize_cips(self):
+        n_cips = total_length(self.cips)
+        self.boundary_cycles = []
+        for c in nx.simple_cycles(G=self.boundary_graph, length_bound=n_cips+1):
+            if len(c) >= n_cips+1:
+                self.boundary_cycles.append(c)
+
+        # TODO there should only be one cycle that is as long is the length of the cips but havent verified this ...
+        self.boundary_cycles = self.boundary_cycles[0]
+
+        # leave only the bounary items that match up with the cips 
+        cip_nodes = [item for sublist in self.cips for item in sublist]
+        diff = (list(set(self.boundary_cycles).difference(set(cip_nodes))))
+        for d in diff:
+            self.boundary_cycles.remove(d)
+
+
+
+    def distribute_boundary_nodes(self):
+        wrap_list = self.boundary_cycles #+ [self.boundary_cycles[0]]
+        num_connect = 4 #ewsn
+        j = (len(self.boundary_cycles) // (num_connect -1)) + 1
+        
+        end_indices = [j*(i+1) - i for i in range(num_connect )]
+        ic(end_indices)
+        self.four_con = {}
+        for ix, end_index in enumerate(end_indices):
+            self.four_con[ix] = wrap_list[end_index-j:end_index]
+            
+        if len(self.four_con[3]) < 2: # TODO change to be in terms of num_connect 
+            self.four_con[3] = [self.boundary_cycles[-1], self.boundary_cycles[0]]
+
+        return self.four_con
+    
+    def four_connect(self):
+        # TODO treatment for when n verts < 4 
+        pass
+        # create nodes and position them 
+        # s < y_min, and centered in x (need hull points)
+        # n > y_max 
+        # e < x_min and centered in y 
+        # w > x_max 
+        
+
 
 
 

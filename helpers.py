@@ -192,3 +192,5 @@ def new_node_pos(n1, n2):
         n_y = np.mean([n1_y, n2_y])
 
     return (n_x, n_y)
+
+
