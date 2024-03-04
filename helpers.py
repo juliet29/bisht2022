@@ -20,14 +20,26 @@ class SeperatingTriangle:
         return f"SeperatingTriangle({self.__dict__})" 
     
 class Domain:
-    def __init__(self, x_min: int, x_max: int, y_min: int, y_max: int) -> None:
+    def __init__(self, x_min: float, x_max: float, y_min: float, y_max: float) -> None:
         self.x_min = x_min
         self.x_max = x_max
         self.y_min = y_min
         self.y_max = y_max
 
     def __repr__(self):
-        return f"Domain({self.__dict__})" 
+        return f"Domain({self.__dict__})"
+    
+class CornerNode:
+    def __init__(self, interior_nodes:list[int] = None, name:str = None, node:int = None, coords: tuple = None, ) -> None:
+        self.interior_nodes = interior_nodes
+        self.name = name
+        self.node = node
+        self.coords = coords
+  
+
+    def __repr__(self):
+        return f"CornerNode({self.__dict__})"
+
 
 
 # plots
@@ -202,5 +214,30 @@ def new_node_pos(n1, n2):
         n_y = np.mean([n1_y, n2_y])
 
     return (n_x, n_y)
+
+
+def any_attribute_matches_value(obj, value):
+    for attr_name in vars(obj):  # Get all attributes of the object
+        if getattr(obj, attr_name) == value:
+            return True
+    return False
+
+
+def get_key_by_value(dictionary, value, object=False):
+    for key, val in dictionary.items():
+        if val == value:
+            return key
+        if object:
+            if any_attribute_matches_value(val, value):
+                return key
+    return None
+
+
+# def get_key_by_object_value(dictionary, value):
+#     for key, val in dictionary.items():
+#         if val == value:
+#             return key
+#     return None
+
 
 

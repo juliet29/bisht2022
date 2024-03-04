@@ -35,6 +35,7 @@ class Processor:
     def start_four_connect(self):
         self.b.organize_cips()
         self.b.distribute_boundary_nodes()
+        self.b.assign_corner_node_pos()
         
 
 

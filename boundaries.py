@@ -84,35 +84,67 @@ class Boundaries:
         diff = (list(set(self.boundary_cycles).difference(set(cip_nodes))))
         for d in diff:
             self.boundary_cycles.remove(d)
+        # TODO need to make sure this is going one direction (CCW or CW)
 
 
 
     def distribute_boundary_nodes(self):
+        self.four_con = {k:CornerNode(name=n) for k,n in zip(range(4), ["SOUTH", "EAST", "NORTH", "WEST"])}
+
+        # TODO clean up .. wrap list once verify that its working .. 
         wrap_list = self.boundary_cycles #+ [self.boundary_cycles[0]]
         num_connect = 4 #ewsn
         j = (len(self.boundary_cycles) // (num_connect -1)) + 1
         
         end_indices = [j*(i+1) - i for i in range(num_connect )]
         ic(end_indices)
-        self.four_con = {}
+        
         for ix, end_index in enumerate(end_indices):
-            self.four_con[ix] = wrap_list[end_index-j:end_index]
+            self.four_con[ix].interior_nodes = wrap_list[end_index-j:end_index]
             
-        if len(self.four_con[3]) < 2: # TODO change to be in terms of num_connect 
-            self.four_con[3] = [self.boundary_cycles[-1], self.boundary_cycles[0]]
+        if len(self.four_con[3].interior_nodes) < 2: # TODO change to be in terms of num_connect 
+            self.four_con[3].interior_nodes = [self.boundary_cycles[-1], self.boundary_cycles[0]]
 
         return self.four_con
+    
+    def assign_corner_node_pos(self):
+        buffer = 1
+        d = find_min_max_coordinates(list(self.embed.values()))
+        
+        x_mid= np.mean([d.x_max, d.x_min])
+        y_mid = np.mean([d.y_max, d.y_min])
+
+        # TODO make custom method ...for this class... ie, make four_con a class instead of dictionary to clean this up.. 
+        self.four_con[get_key_by_value(self.four_con, "SOUTH", object=True)].coords  = (x_mid, d.y_min - buffer)
+        self.four_con[get_key_by_value(self.four_con, "NORTH", object=True)].coords  = (x_mid, d.y_max + buffer)
+
+        self.four_con[get_key_by_value(self.four_con, "EAST", object=True)].coords  = (d.x_min - buffer, y_mid)
+        self.four_con[get_key_by_value(self.four_con, "WEST", object=True)].coords  = (d.x_max + buffer, y_mid)
+
+
     
     def four_connect(self):
         # TODO treatment for when n verts < 4 
         # For now assume n verts > 4 
-        embed_domain = find_min_max_coordinates(list(self.embed.values()))
- 
+        # create four new nodes 
+        d = find_min_max_coordinates(list(self.embed.values()))
+
         # create nodes and position them 
+        for ix, k in enumerate(self.four_con.items()):
+            # indexing starts at 0
+            new_node = len(self.G.nodes) + ix + 1 
         # s < y_min, and centered in x (need hull points)
         # n > y_max 
         # e < x_min and centered in y 
         # w > x_max 
+
+
+        for k, v in self.four_con.items():
+            pass
+            # create the edges
+           
+ 
+        
         
 
 
