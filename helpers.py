@@ -1,116 +1,34 @@
-import networkx as nx
+from helpers_classes import *
+from helpers_plots import *
+
 from icecream import ic
 
 import numpy as np
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 
 from scipy.spatial import ConvexHull
 
+# dictionary utilities
+def any_attribute_matches_value(obj, value):
+    for attr_name in vars(obj):  # Get all attributes of the object
+        # ic(attr_name, getattr(obj, attr_name), value)
+        if getattr(obj, attr_name) == value:
+            return True
+    return False
 
-# simple classes
 
-
-class SeperatingTriangle:
-    def __init__(self, cycle: list, inner_node: int) -> None:
-        self.cycle = cycle
-        self.inner_node = inner_node
-        self.target_edge: tuple = None
-
-    def __repr__(self):
-        return f"SeperatingTriangle({self.__dict__})" 
-    
-class Domain:
-    def __init__(self, x_min: float, x_max: float, y_min: float, y_max: float) -> None:
-        self.x_min = x_min
-        self.x_max = x_max
-        self.y_min = y_min
-        self.y_max = y_max
-
-    def __repr__(self):
-        return f"Domain({self.__dict__})"
-    
-class CornerNode:
-    def __init__(self, interior_nodes:list[int] = None, name:str = None, node:int = None, coords: tuple = None, ) -> None:
-        self.interior_nodes = interior_nodes
-        self.name = name
-        self.node = node
-        self.coords = coords
-  
-
-    def __repr__(self):
-        return f"CornerNode({self.__dict__})"
+def get_key_by_value(dictionary, value, object=False):
+    for key, val in dictionary.items():
+        if val == value:
+            return key
+        if object:
+            if any_attribute_matches_value(val, value):
+                return key
+    return None
 
 
 
-# plots
-def plot_planar_embed(embed: nx.PlanarEmbedding):
-    pos = nx.combinatorial_embedding_to_pos(embed)
-    nx.draw_networkx(nx.Graph(embed), pos)
-
-def plot_planar(G, old_pos=None):
-    # ic(old_pos)
-    pos = old_pos if old_pos else nx.planar_layout(G)
-    pos = nx.draw_networkx(G, pos)
-    return pos
-
-def plot_just_planar(G: nx.Graph, pos=None):
-    try:
-        if not pos:
-            pos = nx.planar_layout(G)
-        nx.draw_networkx(G, pos)
-        return pos
-    except:
-        ic("not planar")
-        nx.draw_networkx(G)
-
-
-## special starting graphs
-
-
-def graph_from_edges(edges):
-    G = nx.Graph()
-    G.add_edges_from(edges)
-    return G
-
-
-def st_graph():
-    order_a = 4
-    order_b = 4
-    G_a = nx.random_regular_graph(3, order_a)
-    G_b = nx.random_regular_graph(2, order_b)
-
-    node_names = [order_a + i for i in range(order_b)]
-    mapping = {
-        old_label: new_label for old_label, new_label in zip(G_b.nodes(), node_names)
-    }
-    G_b = nx.relabel_nodes(G_b, mapping)
-
-    # connect graphs
-    G = nx.union(G_a, G_b)
-    G.add_edge(list(G_a.nodes)[0], node_names[-1])
-
-    return G
-
-
-def square_tri_graph():
-    G = nx.Graph()
-
-    # Add nodes and edges for the square
-    square_nodes = [1, 2, 3, 4]
-    G.add_nodes_from(square_nodes)
-    square_edges = [(1, 2), (2, 3), (3, 4), (4, 1)]
-    G.add_edges_from(square_edges)
-
-    # Add nodes and edges for the triangle
-    triangle_nodes = [5, 6, 7]
-    G.add_nodes_from(triangle_nodes)
-    triangle_edges = [(5, 6), (6, 7), (7, 5)]
-    G.add_edges_from(triangle_edges)
-
-    # Combine both connected components
-    G.add_edge(1, 5)  # Connect a node from the square to a node from the triangle
-
-    return G
 
 
 # utilities
@@ -216,28 +134,46 @@ def new_node_pos(n1, n2):
     return (n_x, n_y)
 
 
-def any_attribute_matches_value(obj, value):
-    for attr_name in vars(obj):  # Get all attributes of the object
-        if getattr(obj, attr_name) == value:
-            return True
-    return False
 
 
-def get_key_by_value(dictionary, value, object=False):
-    for key, val in dictionary.items():
-        if val == value:
-            return key
-        if object:
-            if any_attribute_matches_value(val, value):
-                return key
-    return None
+
+def assign_directions(coords):
+    north = south = east = west = None
+
+    for coord in coords:
+        x, y = coord
+        if north is None or y > north[1]:
+            north = coord
+        if south is None or y < south[1]:
+            south = coord
+        if east is None or x > east[0]:
+            east = coord
+        if west is None or x < west[0]:
+            west = coord
+
+    directions = {'north': north, 'south': south, 'east': east, 'west': west}
+    return directions
 
 
-# def get_key_by_object_value(dictionary, value):
-#     for key, val in dictionary.items():
-#         if val == value:
-#             return key
-#     return None
+def find_point_along_vector(coord, direction_str, distance):
+    # Define direction vectors for cardinal directions
+    direction_vectors = {
+        'north': np.array([0, 1]),
+        'south': np.array([0, -1]),
+        'east': np.array([1, 0]),
+        'west': np.array([-1, 0])
+    }
 
+    # Check if direction string is valid
+    if direction_str not in direction_vectors:
+        raise ValueError("Invalid direction string. Please use 'north', 'south', 'east', or 'west'.")
+
+    # Get direction vector based on the input string
+    direction = direction_vectors[direction_str]
+
+    # Calculate new point coordinates
+    new_point = tuple(coord + direction * distance)
+
+    return new_point
 
 

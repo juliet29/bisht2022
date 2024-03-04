@@ -3,8 +3,8 @@ import random
 
 class FixSeparatingTriangles:
     def __init__(self, G, embed, boundary_edges) -> None:
-        self.G = G
-        self.embed = embed
+        self.G = G.copy()
+        self.embed = embed.copy()
         self.boundary_edges = boundary_edges
         # self.embed = nx.planar_layout(self.G)  # dictionary with node locations
 

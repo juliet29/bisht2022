@@ -7,9 +7,9 @@ from helpers import *
 
 class Boundaries:
     def __init__(self, G: nx.Graph, embed: dict) -> None:
-        # TODO make this and FixSepTris extend a base class with these type hint 
-        self.G = G
-        self.embed = embed
+        # TODO make this and FixSepTris extend a base class with these type hint
+        self.G = G.copy()
+        self.embed = embed.copy()
         self.find_boundary_points()
         self.find_boundary_edges()
 
@@ -87,10 +87,7 @@ class Boundaries:
         # TODO need to make sure this is going one direction (CCW or CW)
 
     def distribute_corner_nodes(self):
-        self.four_con = {
-            k: CornerNode(name=n)
-            for k, n in zip(range(4), ["SOUTH", "EAST", "NORTH", "WEST"])
-        }
+        self.four_con = {k: CornerNode() for k in range(4)}
 
         # TODO clean up .. wrap list once verify that its working ..
         wrap_list = self.boundary_cycles  # + [self.boundary_cycles[0]]
@@ -101,61 +98,85 @@ class Boundaries:
 
         for ix, end_index in enumerate(end_indices):
             self.four_con[ix].interior_nodes = wrap_list[end_index - j : end_index]
-            self.four_con[ix].node = len(self.G.nodes) + ix 
+            self.four_con[ix].node = len(self.G.nodes) + ix
 
-        if (
-            len(self.four_con[num_connect-1].interior_nodes) < 2
-        ): 
+        if len(self.four_con[num_connect - 1].interior_nodes) < 2:
             self.four_con[3].interior_nodes = [
                 self.boundary_cycles[-1],
                 self.boundary_cycles[0],
             ]
 
         return self.four_con
+    
 
-    def assign_corner_node_pos(self):
-        buffer = 0.5
-        d = find_min_max_coordinates(list(self.embed.values()))
+    # def assign_location(self, key):
+    #     buffer = 1
+    #     item = self.four_con[get_key_by_value(self.four_con, self.dir_data[key], object=True)]
+    #     item.name = key
+    #     item.location = find_point_along_vector(item.mean_location, key, buffer)
 
-        x_mid = np.mean([d.x_max, d.x_min])
-        y_mid = np.mean([d.y_max, d.y_min])
+    #     return
 
-        # TODO make custom method ...for this class... ie, make four_con a class instead of dictionary to clean this up..or just fx..
-        self.four_con[get_key_by_value(self.four_con, "SOUTH", object=True)].coords = (
-            x_mid,
-            d.y_min - buffer,
-        )
-        self.four_con[get_key_by_value(self.four_con, "NORTH", object=True)].coords = (
-            x_mid,
-            d.y_max + buffer,
-        )
+    def locate_corner_nodes(self, buffer = 1):
+        # get the central location of interior nodes for a given corner node
+        for v in self.four_con.values():
+            arr = np.array([self.embed[i] for i in v.interior_nodes])
+            v.mean_location = (np.mean(arr[:, 0]), np.mean(arr[:, 1]))
+    
+        # determine whicch of these locations are most north, east etc
+        coords = [v.mean_location for v in self.four_con.values()]
+        self.direction_dict = assign_directions(coords)
+         
+        for k, v in self.direction_dict.items():
+            # match items in four_con dictionary to the direction dict
+            item = self.four_con[get_key_by_value(self.four_con, self.direction_dict[k], object=True)]
+            item.name = k
+            # assign location with approp direction 
+            item.location = find_point_along_vector(item.mean_location, k, buffer)
+            # self.assign_location(k)
 
-        self.four_con[get_key_by_value(self.four_con, "WEST", object=True)].coords = (
-            d.x_min - buffer,
-            y_mid,
-        )
-        self.four_con[get_key_by_value(self.four_con, "EAST", object=True)].coords = (
-            d.x_max + buffer,
-            y_mid,
-        )
+
+    # def assign_corner_node_pos(self):
+    #     buffer = 0.5
+    #     d = find_min_max_coordinates(list(self.embed.values()))
+
+    #     x_mid = np.mean([d.x_max, d.x_min])
+    #     y_mid = np.mean([d.y_max, d.y_min])
+
+    #     # TODO make custom method ...for this class... ie, make four_con a class instead of dictionary to clean this up..or just fx..
+    #     self.four_con[get_key_by_value(self.four_con, "SOUTH", object=True)].coords = (
+    #         x_mid,
+    #         d.y_min - buffer,
+    #     )
+    #     self.four_con[get_key_by_value(self.four_con, "NORTH", object=True)].coords = (
+    #         x_mid,
+    #         d.y_max + buffer,
+    #     )
+
+    #     self.four_con[get_key_by_value(self.four_con, "WEST", object=True)].coords = (
+    #         d.x_min - buffer,
+    #         y_mid,
+    #     )
+    #     self.four_con[get_key_by_value(self.four_con, "EAST", object=True)].coords = (
+    #         d.x_max + buffer,
+    #         y_mid,
+    #     )
 
     def four_connect(self):
         # TODO treatment for when n verts < 4
 
         for ix, (k, v) in enumerate(self.four_con.items()):
-            # update graph edges 
+            # update graph edges
             new_edges = []
             for node in v.interior_nodes:
                 new_edges.append((v.node, node))
                 self.G.add_edges_from(new_edges)
 
-            # update embedding 
-            self.embed[v.node] = v.coords
+            # update embedding
+            self.embed[v.node] = np.array(v.location)
 
         planar_check, self.planarG = nx.check_planarity(self.G)
         if planar_check:
             ic("Passes planarity check")
         else:
             ic("FAILS PLANAR CHECK!!!!")
-
-
