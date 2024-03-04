@@ -2,6 +2,7 @@ from helpers import *
 
 
 ## NOTE: keeping this seperate from augment.py class, bc could possibly want to get boundary at anyy stage of the augmentation, but could put togetehr later ..
+# yes, earlier functions are more of a general graph utility class, while the later functions will only be used at one stage ... 03/04/24
 
 
 class Boundaries:
@@ -93,7 +94,7 @@ class Boundaries:
 
         # TODO clean up .. wrap list once verify that its working ..
         wrap_list = self.boundary_cycles  # + [self.boundary_cycles[0]]
-        num_connect = 4  # ewsn
+        num_connect = 4  # east, west, south, north
         j = (len(self.boundary_cycles) // (num_connect - 1)) + 1
 
         end_indices = [j * (i + 1) - i for i in range(num_connect)]
@@ -103,8 +104,8 @@ class Boundaries:
             self.four_con[ix].node = len(self.G.nodes) + ix 
 
         if (
-            len(self.four_con[3].interior_nodes) < 2
-        ):  # TODO change to be in terms of num_connect
+            len(self.four_con[num_connect-1].interior_nodes) < 2
+        ): 
             self.four_con[3].interior_nodes = [
                 self.boundary_cycles[-1],
                 self.boundary_cycles[0],
