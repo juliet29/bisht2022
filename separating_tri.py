@@ -72,7 +72,7 @@ class FixSeparatingTriangles:
             ic(tri.target_edge)
             new_edges = [(n1, new_node), (n2, new_node), (tri.inner_node, new_node)]
 
-            # update graph .. 
+            # update graph edges 
             self.G_no_st.remove_edge(n1, n2)
             self.G_no_st.add_edges_from(new_edges)
 
