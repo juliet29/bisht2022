@@ -84,20 +84,18 @@ class Boundaries:
         diff = list(set(self.boundary_cycles).difference(set(cip_nodes)))
         for d in diff:
             self.boundary_cycles.remove(d)
-        # TODO need to make sure this is going one direction (CCW or CW)
+
 
     def distribute_corner_nodes(self):
         self.four_con = {k: CornerNode() for k in range(4)}
 
-        # TODO clean up .. wrap list once verify that its working ..
-        wrap_list = self.boundary_cycles  # + [self.boundary_cycles[0]]
-        num_connect = 4  # east, west, south, north
+        # east, west, south, north
+        num_connect = 4  #
         j = (len(self.boundary_cycles) // (num_connect - 1)) + 1
-
         end_indices = [j * (i + 1) - i for i in range(num_connect)]
 
         for ix, end_index in enumerate(end_indices):
-            self.four_con[ix].interior_nodes = wrap_list[end_index - j : end_index]
+            self.four_con[ix].interior_nodes = self.boundary_cycles[end_index - j : end_index]
             self.four_con[ix].node = len(self.G.nodes) + ix
 
         if len(self.four_con[num_connect - 1].interior_nodes) < 2:
@@ -109,14 +107,6 @@ class Boundaries:
         return self.four_con
     
 
-    # def assign_location(self, key):
-    #     buffer = 1
-    #     item = self.four_con[get_key_by_value(self.four_con, self.dir_data[key], object=True)]
-    #     item.name = key
-    #     item.location = find_point_along_vector(item.mean_location, key, buffer)
-
-    #     return
-
     def locate_corner_nodes(self, buffer = 1):
         # get the central location of interior nodes for a given corner node
         for v in self.four_con.values():
@@ -125,7 +115,9 @@ class Boundaries:
     
         # determine whicch of these locations are most north, east etc
         coords = [v.mean_location for v in self.four_con.values()]
-        self.direction_dict = assign_directions(coords)
+        # self.sorted_coords = sorted(coords, key=lambda x: x[0])
+        self.sorted_coords = furthest_points_first(coords)
+        self.direction_dict = assign_directions(self.sorted_coords)
          
         for k, v in self.direction_dict.items():
             # match items in four_con dictionary to the direction dict
@@ -133,34 +125,8 @@ class Boundaries:
             item.name = k
             # assign location with approp direction 
             item.location = find_point_along_vector(item.mean_location, k, buffer)
-            # self.assign_location(k)
 
 
-    # def assign_corner_node_pos(self):
-    #     buffer = 0.5
-    #     d = find_min_max_coordinates(list(self.embed.values()))
-
-    #     x_mid = np.mean([d.x_max, d.x_min])
-    #     y_mid = np.mean([d.y_max, d.y_min])
-
-    #     # TODO make custom method ...for this class... ie, make four_con a class instead of dictionary to clean this up..or just fx..
-    #     self.four_con[get_key_by_value(self.four_con, "SOUTH", object=True)].coords = (
-    #         x_mid,
-    #         d.y_min - buffer,
-    #     )
-    #     self.four_con[get_key_by_value(self.four_con, "NORTH", object=True)].coords = (
-    #         x_mid,
-    #         d.y_max + buffer,
-    #     )
-
-    #     self.four_con[get_key_by_value(self.four_con, "WEST", object=True)].coords = (
-    #         d.x_min - buffer,
-    #         y_mid,
-    #     )
-    #     self.four_con[get_key_by_value(self.four_con, "EAST", object=True)].coords = (
-    #         d.x_max + buffer,
-    #         y_mid,
-    #     )
 
     def four_connect(self):
         # TODO treatment for when n verts < 4

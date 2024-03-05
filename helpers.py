@@ -1,9 +1,11 @@
 from helpers_classes import *
 from helpers_plots import *
 
-from icecream import ic
+import itertools
 
+from icecream import ic
 import numpy as np
+
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 
@@ -27,6 +29,24 @@ def get_key_by_value(dictionary, value, object=False):
                 return key
     return None
 
+def find_keys_with_same_value(dictionary):
+    # Initialize a dictionary to store keys by their values
+    keys_by_value = {}
+
+    # Iterate over the dictionary
+    for key, value in dictionary.items():
+        # Check if the value is already in the keys_by_value dictionary
+        if value in keys_by_value:
+            # Append the current key to the list of keys associated with this value
+            keys_by_value[value].append(key)
+        else:
+            # Create a new list with the current key for this value
+            keys_by_value[value] = [key]
+
+    # Filter out values with only one key associated with them
+    keys_with_same_value = {value: keys for value, keys in keys_by_value.items() if len(keys) > 1}
+
+    return keys_with_same_value
 
 
 
@@ -134,25 +154,119 @@ def new_node_pos(n1, n2):
     return (n_x, n_y)
 
 
+def furthest_coordinate(coord1, coord2, direction):
+    # Define a dictionary mapping directions to coordinate components
+    direction_mapping = {
+        'north': lambda coord: coord[1],
+        'south': lambda coord: -coord[1],
+        'east': lambda coord: coord[0],
+        'west': lambda coord: -coord[0]
+    }
 
+    # Check if the provided direction is valid
+    if direction.lower() in direction_mapping:
+        # Get the coordinate components for the specified direction
+        comp1 = direction_mapping[direction.lower()](coord1)
+        comp2 = direction_mapping[direction.lower()](coord2)
+
+        # Determine the furthest coordinate in the specified direction
+        if comp1 > comp2:
+            return coord1
+        elif comp1 < comp2:
+            return coord2
+        else:
+            return "Both coordinates are equidistant in the specified direction"
+    else:
+        return "Invalid direction"
 
 
 def assign_directions(coords):
     north = south = east = west = None
 
     for coord in coords:
+        ic(f"NEW COORD {coord}")
         x, y = coord
         if north is None or y > north[1]:
+            ic(coord, "north")
             north = coord
         if south is None or y < south[1]:
+            ic(coord, "south")
             south = coord
         if east is None or x > east[0]:
+            ic(coord, "east")
             east = coord
         if west is None or x < west[0]:
+            ic(coord, "west")
             west = coord
 
     directions = {'north': north, 'south': south, 'east': east, 'west': west}
+
+    # edge case 
+    if find_keys_with_same_value(directions): 
+        missing_coord = list(set(coords) - set([v for v in directions.values()]))[0]
+        double_count_coord = list(find_keys_with_same_value(directions).keys())[0]
+    
+        dir1, dir2 = list(find_keys_with_same_value(directions).values())[0][0]
+
+        res = furthest_coordinate(missing_coord, double_count_coord, dir1)
+        directions[dir1] = res
+
+        leftover = set([missing_coord, double_count_coord]) - set([res])
+        directions[dir2] = leftover
+
     return directions
+
+def distance(point1, point2):
+    """Calculate Euclidean distance between two points."""
+    return np.sqrt((point1[0] - point2[0])**2 + (point1[1] - point2[1])**2)
+
+def furthest_points_first(points):
+    """Sort a list of points such that the points with the furthest distance between each other come first."""
+    max_distance = 0
+    furthest_pair = None
+
+    # Calculate pairwise distances and find the furthest pair
+    for pair in itertools.combinations(points, 2):
+        d = distance(*pair)
+        if d > max_distance:
+            max_distance = d
+            furthest_pair = pair
+
+    # Swap furthest pair to the front of the list
+    if furthest_pair:
+        points.remove(furthest_pair[0])
+        points.remove(furthest_pair[1])
+        return [furthest_pair[0], furthest_pair[1]] + points
+    else:
+        return points  #
+
+# def assign_directions2(coords):
+#     if not coords:
+#         return {}
+
+#     # Initialize direction labels with the first point
+#     north = south = coords[0]
+#     east = west = coords[0]
+
+#     for coord in coords[1:]:
+#         x, y = coord
+
+#         if y > north[1]:
+#             ic(coord, "north")
+#             north = coord
+#         elif y < south[1]:
+#             ic(coord, "south")
+#             south = coord
+
+#         if x > east[0]:
+#             ic(coord, "east")
+#             east = coord
+#         elif x < west[0]:
+#             ic(coord, "west")
+#             west = coord
+
+#     directions = {'north': north, 'south': south, 'east': east, 'west': west}
+#     return directions
 
 
 def find_point_along_vector(coord, direction_str, distance):
