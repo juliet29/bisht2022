@@ -107,7 +107,7 @@ class Boundaries:
         return self.four_con
     
 
-    def locate_corner_nodes(self, buffer = 1):
+    def locate_corner_nodes(self, buffer = 0.5):
         # get the central location of interior nodes for a given corner node
         for v in self.four_con.values():
             arr = np.array([self.embed[i] for i in v.interior_nodes])
@@ -116,11 +116,10 @@ class Boundaries:
         # determine whicch of these locations are most north, east etc
         coords = [v.mean_location for v in self.four_con.values()]
         # self.sorted_coords = sorted(coords, key=lambda x: x[0])
-        self.sorted_coords = furthest_points_first(coords)
-        self.direction_dict = assign_directions(self.sorted_coords)
+        # self.sorted_coords = furthest_points_first(coords)
+        self.direction_dict = assign_directions(coords)
          
         for k, v in self.direction_dict.items():
-            ic(k)
             # match items in four_con dictionary to the direction dict
             item = self.four_con[get_key_by_value(self.four_con, self.direction_dict[k], object=True)]
             item.name = k

@@ -184,19 +184,19 @@ def assign_directions(coords):
     north = south = east = west = None
 
     for coord in coords:
-        ic(f"NEW COORD {coord}")
+        # ic(f"NEW COORD {coord}")
         x, y = coord
         if north is None or y > north[1]:
-            ic(coord, "north")
+            # ic(coord, "north")
             north = coord
         if south is None or y < south[1]:
-            ic(coord, "south")
+            # ic(coord, "south")
             south = coord
         if east is None or x > east[0]:
-            ic(coord, "east")
+            # ic(coord, "east")
             east = coord
         if west is None or x < west[0]:
-            ic(coord, "west")
+            # ic(coord, "west")
             west = coord
 
     directions = {'north': north, 'south': south, 'east': east, 'west': west}
@@ -223,57 +223,30 @@ def assign_directions(coords):
 
    
 
-def distance(point1, point2):
-    """Calculate Euclidean distance between two points."""
-    return np.sqrt((point1[0] - point2[0])**2 + (point1[1] - point2[1])**2)
+# def distance(point1, point2):
+#     """Calculate Euclidean distance between two points."""
+#     return np.sqrt((point1[0] - point2[0])**2 + (point1[1] - point2[1])**2)
 
-def furthest_points_first(points):
-    """Sort a list of points such that the points with the furthest distance between each other come first."""
-    max_distance = 0
-    furthest_pair = None
+# def furthest_points_first(points):
+#     """Sort a list of points such that the points with the furthest distance between each other come first."""
+#     max_distance = 0
+#     furthest_pair = None
 
-    # Calculate pairwise distances and find the furthest pair
-    for pair in itertools.combinations(points, 2):
-        d = distance(*pair)
-        if d > max_distance:
-            max_distance = d
-            furthest_pair = pair
+#     # Calculate pairwise distances and find the furthest pair
+#     for pair in itertools.combinations(points, 2):
+#         d = distance(*pair)
+#         if d > max_distance:
+#             max_distance = d
+#             furthest_pair = pair
 
-    # Swap furthest pair to the front of the list
-    if furthest_pair:
-        points.remove(furthest_pair[0])
-        points.remove(furthest_pair[1])
-        return [furthest_pair[0], furthest_pair[1]] + points
-    else:
-        return points  #
+#     # Swap furthest pair to the front of the list
+#     if furthest_pair:
+#         points.remove(furthest_pair[0])
+#         points.remove(furthest_pair[1])
+#         return [furthest_pair[0], furthest_pair[1]] + points
+#     else:
+#         return points  #
 
-# def assign_directions2(coords):
-#     if not coords:
-#         return {}
-
-#     # Initialize direction labels with the first point
-#     north = south = coords[0]
-#     east = west = coords[0]
-
-#     for coord in coords[1:]:
-#         x, y = coord
-
-#         if y > north[1]:
-#             ic(coord, "north")
-#             north = coord
-#         elif y < south[1]:
-#             ic(coord, "south")
-#             south = coord
-
-#         if x > east[0]:
-#             ic(coord, "east")
-#             east = coord
-#         elif x < west[0]:
-#             ic(coord, "west")
-#             west = coord
-
-#     directions = {'north': north, 'south': south, 'east': east, 'west': west}
-#     return directions
 
 
 def find_point_along_vector(coord, direction_str, distance):
