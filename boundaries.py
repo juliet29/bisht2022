@@ -120,6 +120,7 @@ class Boundaries:
         self.direction_dict = assign_directions(self.sorted_coords)
          
         for k, v in self.direction_dict.items():
+            ic(k)
             # match items in four_con dictionary to the direction dict
             item = self.four_con[get_key_by_value(self.four_con, self.direction_dict[k], object=True)]
             item.name = k

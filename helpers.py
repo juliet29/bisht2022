@@ -203,18 +203,25 @@ def assign_directions(coords):
 
     # edge case 
     if find_keys_with_same_value(directions): 
+        ic(directions)
         missing_coord = list(set(coords) - set([v for v in directions.values()]))[0]
         double_count_coord = list(find_keys_with_same_value(directions).keys())[0]
     
-        dir1, dir2 = list(find_keys_with_same_value(directions).values())[0][0]
+        dir1, dir2 = list(find_keys_with_same_value(directions).values())[0]
 
         res = furthest_coordinate(missing_coord, double_count_coord, dir1)
         directions[dir1] = res
 
         leftover = set([missing_coord, double_count_coord]) - set([res])
-        directions[dir2] = leftover
+        directions[dir2] = list(leftover)[0]
 
-    return directions
+        ic(directions)
+
+        return directions
+    else:
+        return directions
+
+   
 
 def distance(point1, point2):
     """Calculate Euclidean distance between two points."""
