@@ -20,19 +20,24 @@ class Processor:
 
     def fix_separating_triangles(self):
         self.b_st = Boundaries(self.G, self.embed)
-        self.s = FixSeparatingTriangles(self.G, self.embed, self.b_st.boundary_edges)
+        self.s = SeparatingTriangles(self.G, self.embed, self.b_st.boundary_edges)
 
         self.G = self.s.run_st()
         self.embed = self.s.embed
 
-    def find_cips(self):
+    def fix_cips(self):
         self.b = Boundaries(self.G, self.embed)
         self.b.find_cips()
-        # TODO fix if needed ...
+        # right now does not modify the graph 
+        # TODO fix if > than 4 cips
 
-    def start_four_connect(self):
+    def add_corner_nodes(self):
         self.b.organize_cips()
         self.b.distribute_corner_nodes()
+        self.b.locate_corner_nodes()
+        self.b.connect_corner_nodes()
+        # TODO => should have clean thing that is like run_corner_nodes 
+        
 
         # self.b.assign_corner_node_pos()
         # self.b.four_connect()

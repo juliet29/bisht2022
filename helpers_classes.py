@@ -1,9 +1,10 @@
 # simple classes
-class SeperatingTriangle:
+class SeperatingTriangleData:
     def __init__(self, cycle: list, inner_node: int) -> None:
         self.cycle = cycle
         self.inner_node = inner_node
         self.target_edge: tuple = None
+    # TODO RENAME THIS!!
 
     def __repr__(self):
         return f"SeperatingTriangle({self.__dict__})"

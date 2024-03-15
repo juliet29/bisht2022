@@ -1,14 +1,12 @@
 from helpers import *
 import random
 
-class FixSeparatingTriangles:
+
+class SeparatingTriangles:
     def __init__(self, G, embed, boundary_edges) -> None:
         self.G = G.copy()
         self.embed = embed.copy()
         self.boundary_edges = boundary_edges
-        # self.embed = nx.planar_layout(self.G)  # dictionary with node locations
-
-        pass
 
     def run_st(self):
         self.find_st()
@@ -28,12 +26,13 @@ class FixSeparatingTriangles:
             domain = find_min_max_coordinates(coords)
 
             for node in other_nodes:
-                # TODO double check if this is correct for nested triangles.. => bc inner node might be different depending on the cycle 
+                # TODO double check if this is correct for nested triangles.. => bc inner node might be different depending on the cycle
                 if (
                     check_point_in_hull(domain, self.embed[node])
                     and cycle not in self.sep_triangles
                 ):
-                    self.sep_triangles.append(SeperatingTriangle(cycle, node))
+                    self.sep_triangles.append(SeperatingTriangleData(cycle, node))
+
 
         return self.sep_triangles
 
@@ -44,10 +43,12 @@ class FixSeparatingTriangles:
         ]
 
         # will find a set of less than k edges that are needed to solve st problem  => here setting to n
-        edges = self.boundary_edges #list(self.G.edges()) # TODO change so only have boundary edges..
+        edges = (
+            self.boundary_edges
+        )  # list(self.G.edges()) # TODO change so only have boundary edges..
         k = len(edges)
         random.shuffle(edges)
-        random_graph_edges = edges[:k] 
+        random_graph_edges = edges[:k]
 
         covering_status = []
         # self.target_edges = []
@@ -72,22 +73,21 @@ class FixSeparatingTriangles:
             ic(tri.target_edge)
             new_edges = [(n1, new_node), (n2, new_node), (tri.inner_node, new_node)]
 
-            # update graph edges 
+            # update graph edges
             self.G_no_st.remove_edge(n1, n2)
             self.G_no_st.add_edges_from(new_edges)
 
-            # update positions in embedding 
+            # update positions in embedding
             new_pos = new_node_pos(self.embed[n1], self.embed[n2])
             self.embed[new_node] = np.array(new_pos)
-            
 
         return self.G_no_st
-    
+
     def seperating_triangle_check(self, G=None):
         local_G = G if G else self.G_no_st
         l3_cycles = sorted(nx.simple_cycles(local_G, 3))
         m = len(list(local_G.edges))
         n = len(list(local_G.nodes))
         # if self.DEBUG:
-        ic(len(l3_cycles), m, n, m-n+1);
-        assert len(l3_cycles) == m-n+1,   f"{len(l3_cycles), m, n, m-n+1}"  
+        ic(len(l3_cycles), m, n, m - n + 1)
+        assert len(l3_cycles) == m - n + 1, f"{len(l3_cycles), m, n, m-n+1}"

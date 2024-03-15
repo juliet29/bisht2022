@@ -85,9 +85,8 @@ class Boundaries:
         for d in diff:
             self.boundary_cycles.remove(d)
 
-
     def distribute_corner_nodes(self):
-        self.four_con = {k: CornerNode() for k in range(4)}
+        self.corner_node_data = {k: CornerNode() for k in range(4)}
 
         # east, west, south, north
         num_connect = 4  #
@@ -95,43 +94,42 @@ class Boundaries:
         end_indices = [j * (i + 1) - i for i in range(num_connect)]
 
         for ix, end_index in enumerate(end_indices):
-            self.four_con[ix].interior_nodes = self.boundary_cycles[end_index - j : end_index]
-            self.four_con[ix].node = len(self.G.nodes) + ix
+            self.corner_node_data[ix].interior_nodes = self.boundary_cycles[
+                end_index - j : end_index
+            ]
+            self.corner_node_data[ix].node = len(self.G.nodes) + ix
 
-        if len(self.four_con[num_connect - 1].interior_nodes) < 2:
-            self.four_con[3].interior_nodes = [
+        if len(self.corner_node_data[num_connect - 1].interior_nodes) < 2:
+            self.corner_node_data[3].interior_nodes = [
                 self.boundary_cycles[-1],
                 self.boundary_cycles[0],
             ]
 
-        return self.four_con
-    
+        return self.corner_node_data
 
-    def locate_corner_nodes(self, buffer = 0.5):
+    def locate_corner_nodes(self, buffer=0.5):
         # get the central location of interior nodes for a given corner node
-        for v in self.four_con.values():
+        for v in self.corner_node_data.values():
             arr = np.array([self.embed[i] for i in v.interior_nodes])
             v.mean_location = (np.mean(arr[:, 0]), np.mean(arr[:, 1]))
-    
+
         # determine whicch of these locations are most north, east etc
-        coords = [v.mean_location for v in self.four_con.values()]
-        # self.sorted_coords = sorted(coords, key=lambda x: x[0])
-        # self.sorted_coords = furthest_points_first(coords)
+        coords = [v.mean_location for v in self.corner_node_data.values()]
         self.direction_dict = assign_directions(coords)
-         
+
         for k, v in self.direction_dict.items():
             # match items in four_con dictionary to the direction dict
-            item = self.four_con[get_key_by_value(self.four_con, self.direction_dict[k], object=True)]
+            item = self.corner_node_data[
+                get_key_by_value(self.corner_node_data, self.direction_dict[k], object=True)
+            ]
             item.name = k
-            # assign location with approp direction 
+            # assign location with approp direction
             item.location = find_point_along_vector(item.mean_location, k, buffer)
 
-
-
-    def four_connect(self):
+    def connect_corner_nodes(self):
         # TODO treatment for when n verts < 4
 
-        for ix, (k, v) in enumerate(self.four_con.items()):
+        for ix, (k, v) in enumerate(self.corner_node_data.items()):
             # update graph edges
             new_edges = []
             for node in v.interior_nodes:
@@ -141,8 +139,17 @@ class Boundaries:
             # update embedding
             self.embed[v.node] = np.array(v.location)
 
-        planar_check, self.planarG = nx.check_planarity(self.G)
+
+        planar_check, self.alt_planar_G = nx.check_planarity(self.G)
         if planar_check:
             ic("Passes planarity check")
         else:
             ic("FAILS PLANAR CHECK!!!!")
+
+    def distinguish_corner_nodes(self):
+        corner_node_ix = [v.node for v in self.corner_node_data.values()]
+        for ix in self.G.nodes:
+            if ix in corner_node_ix:
+                self.G.nodes[ix]["corner_or_interior"] = "corner"
+            else: 
+                self.G.nodes[ix]["corner_or_interior"] = "interior"

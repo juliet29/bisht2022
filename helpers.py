@@ -221,33 +221,6 @@ def assign_directions(coords):
     else:
         return directions
 
-   
-
-# def distance(point1, point2):
-#     """Calculate Euclidean distance between two points."""
-#     return np.sqrt((point1[0] - point2[0])**2 + (point1[1] - point2[1])**2)
-
-# def furthest_points_first(points):
-#     """Sort a list of points such that the points with the furthest distance between each other come first."""
-#     max_distance = 0
-#     furthest_pair = None
-
-#     # Calculate pairwise distances and find the furthest pair
-#     for pair in itertools.combinations(points, 2):
-#         d = distance(*pair)
-#         if d > max_distance:
-#             max_distance = d
-#             furthest_pair = pair
-
-#     # Swap furthest pair to the front of the list
-#     if furthest_pair:
-#         points.remove(furthest_pair[0])
-#         points.remove(furthest_pair[1])
-#         return [furthest_pair[0], furthest_pair[1]] + points
-#     else:
-#         return points  #
-
-
 
 def find_point_along_vector(coord, direction_str, distance):
     # Define direction vectors for cardinal directions
