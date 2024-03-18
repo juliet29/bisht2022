@@ -14,7 +14,6 @@ from scipy.spatial import ConvexHull
 # dictionary utilities
 def any_attribute_matches_value(obj, value):
     for attr_name in vars(obj):  # Get all attributes of the object
-        # ic(attr_name, getattr(obj, attr_name), value)
         if getattr(obj, attr_name) == value:
             return True
     return False
@@ -24,6 +23,7 @@ def get_key_by_value(dictionary, value, object=False):
     for key, val in dictionary.items():
         if val == value:
             return key
+        # if the dictionary has objects as its values in each key value pair, set object=True
         if object:
             if any_attribute_matches_value(val, value):
                 return key

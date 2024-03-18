@@ -36,6 +36,7 @@ class Processor:
         self.b.distribute_corner_nodes()
         self.b.locate_corner_nodes()
         self.b.connect_corner_nodes()
+        self.b.distinguish_corner_nodes()
         # TODO => should have clean thing that is like run_corner_nodes 
         
 
