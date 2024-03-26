@@ -32,6 +32,7 @@ class Processor:
         # TODO fix if > than 4 cips
 
     def add_corner_nodes(self):
+        
         self.b.organize_cips()
         self.b.distribute_corner_nodes()
         self.b.locate_corner_nodes()

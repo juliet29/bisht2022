@@ -68,8 +68,8 @@ class Boundaries:
                     self.cips.append(path)
 
         assert len(self.cips) <= 4, "More than 4 corner implying paths"
-
-    def organize_cips(self):
+    
+    def find_boundary_cycle(self):
         n_cips = total_length(self.cips)
         self.boundary_cycles = []
         for c in nx.simple_cycles(G=self.boundary_graph, length_bound=n_cips + 1):
@@ -79,6 +79,8 @@ class Boundaries:
         # TODO there should only be one cycle that is as long is the length of the cips but havent verified this ...
         self.boundary_cycles = self.boundary_cycles[0]
 
+    def organize_cips(self):
+        self.find_boundary_cycle()
         # leave only the bounary items that match up with the cips
         cip_nodes = [item for sublist in self.cips for item in sublist]
         diff = list(set(self.boundary_cycles).difference(set(cip_nodes)))
