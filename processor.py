@@ -38,7 +38,8 @@ class Processor:
     def set_canonical_order(self):
         self.c = CanonicalOrder(self.GraphData)
         self.c.run()
-        self.GraphData = GraphData(self.c.G, self.c.embed)
+        self.GraphData.graph = self.c.G, 
+        self.GraphData.embed = self.c.embed
 
 
     def run(self):
