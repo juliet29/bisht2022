@@ -31,11 +31,11 @@ def graph_from_edges(edges):
     return G
 
 
-def st_graph():
+def st_graph(seed):
     order_a = 4
     order_b = 4
-    G_a = nx.random_regular_graph(3, order_a)
-    G_b = nx.random_regular_graph(2, order_b)
+    G_a = nx.random_regular_graph(3, order_a, seed)
+    G_b = nx.random_regular_graph(2, order_b, seed)
 
     node_names = [order_a + i for i in range(order_b)]
     mapping = {
