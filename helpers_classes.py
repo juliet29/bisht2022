@@ -1,3 +1,4 @@
+import networkx as nx
 # simple classes
 class SeperatingTriangleData:
     def __init__(self, cycle: list, inner_node: int) -> None:
@@ -40,3 +41,16 @@ class CornerNode:
 
     def __repr__(self):
         return f"CornerNode({self.__dict__})"
+    
+class GraphData:
+    def __init__(
+        self,
+        graph: nx.Graph,
+        embed: dict,
+        corner_node_data:dict=None
+    ) -> None:
+        self.graph = graph
+        self.embed = embed
+        self.corner_node_data = corner_node_data
+    def __repr__(self):
+        return f"GraphData{self.__dict__})"

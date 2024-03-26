@@ -2,6 +2,7 @@ from helpers import *
 from augment import *
 from separating_tri import *
 from boundaries import *
+from canonical_order import *
 
 
 class Processor:
@@ -25,20 +26,35 @@ class Processor:
         self.G = self.s.run_st()
         self.embed = self.s.embed
 
-    def fix_cips(self):
+    def fix_cips_and_add_corner_nodes(self):
         self.b = Boundaries(self.G, self.embed)
-        self.b.find_cips()
-        # right now does not modify the graph 
-        # TODO fix if > than 4 cips
+        self.b.fix_cips_and_add_corner_nodes()
+        # TODO clean this up! 
+        self.G = self.b.G
+        self.embed = self.b.embed
 
-    def add_corner_nodes(self):
+        self.GraphData = GraphData(self.b.G, self.b.embed, self.b.corner_node_data)
+
+    def set_canonical_order(self):
+        self.c = CanonicalOrder(self.GraphData)
+        self.c.run()
+        self.GraphData = GraphData(self.c.G, self.c.embed)
+
+
+    def run(self):
+        self.augment()
+        self.fix_separating_triangles()
+        self.fix_cips_and_add_corner_nodes()
+        self.set_canonical_order()
+
+    # def add_corner_nodes(self):
         
-        self.b.organize_cips()
-        self.b.distribute_corner_nodes()
-        self.b.locate_corner_nodes()
-        self.b.connect_corner_nodes()
-        self.b.distinguish_corner_nodes()
-        # TODO => should have clean thing that is like run_corner_nodes 
+    #     self.b.organize_cips()
+    #     self.b.distribute_corner_nodes()
+    #     self.b.locate_corner_nodes()
+    #     self.b.connect_corner_nodes()
+    #     self.b.distinguish_corner_nodes()
+    #     # TODO => should have clean thing that is like run_corner_nodes 
         
 
         # self.b.assign_corner_node_pos()

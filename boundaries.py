@@ -1,4 +1,5 @@
 from helpers import *
+from scipy.spatial import ConvexHull
 
 
 ## NOTE: keeping this seperate from augment.py class, bc could possibly want to get boundary at anyy stage of the augmentation, but could put togetehr later ..
@@ -12,6 +13,20 @@ class Boundaries:
         self.embed = embed.copy()
         self.find_boundary_points()
         self.find_boundary_edges()
+
+    def fix_cips_and_add_corner_nodes(self):
+        self.find_cips()  # right now does not modify the graph 
+        # TODO fix if > than 4 cips
+        # self.fix_cips()
+        self.add_corner_nodes()
+        
+
+    def add_corner_nodes(self):
+        self.organize_cips()
+        self.distribute_corner_nodes()
+        self.locate_corner_nodes()
+        self.connect_corner_nodes()
+        self.distinguish_corner_nodes()
 
     def find_boundary_points(self):
         embed_arr = np.array([self.embed[key] for key in sorted(self.embed.keys())])
