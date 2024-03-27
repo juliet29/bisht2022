@@ -15,11 +15,10 @@ class Boundaries:
         self.find_boundary_edges()
 
     def fix_cips_and_add_corner_nodes(self):
-        self.find_cips()  # right now does not modify the graph 
+        self.find_cips()  # right now does not modify the graph
         # TODO fix if > than 4 cips
         # self.fix_cips()
         self.add_corner_nodes()
-        
 
     def add_corner_nodes(self):
         self.organize_cips()
@@ -83,7 +82,7 @@ class Boundaries:
                     self.cips.append(path)
 
         assert len(self.cips) <= 4, "More than 4 corner implying paths"
-    
+
     def find_boundary_cycle(self):
         n_cips = total_length(self.cips)
         self.boundary_cycles = []
@@ -111,13 +110,13 @@ class Boundaries:
         end_indices = [j * (i + 1) - i for i in range(num_connect)]
 
         for ix, end_index in enumerate(end_indices):
-            self.corner_node_data[ix].interior_nodes = self.boundary_cycles[
+            self.corner_node_data[ix].neighbour_indices = self.boundary_cycles[
                 end_index - j : end_index
             ]
-            self.corner_node_data[ix].node = len(self.G.nodes) + ix
+            self.corner_node_data[ix].index = len(self.G.nodes) + ix
 
-        if len(self.corner_node_data[num_connect - 1].interior_nodes) < 2:
-            self.corner_node_data[3].interior_nodes = [
+        if len(self.corner_node_data[num_connect - 1].neighbour_indices) < 2:
+            self.corner_node_data[3].neighbour_indices = [
                 self.boundary_cycles[-1],
                 self.boundary_cycles[0],
             ]
@@ -127,7 +126,7 @@ class Boundaries:
     def locate_corner_nodes(self, buffer=0.5):
         # get the central location of interior nodes for a given corner node
         for v in self.corner_node_data.values():
-            arr = np.array([self.embed[i] for i in v.interior_nodes])
+            arr = np.array([self.embed[i] for i in v.neighbour_indices])
             v.mean_location = (np.mean(arr[:, 0]), np.mean(arr[:, 1]))
 
         # determine whicch of these locations are most north, east etc
@@ -137,7 +136,9 @@ class Boundaries:
         for k, v in self.direction_dict.items():
             # match items in four_con dictionary to the direction dict
             item = self.corner_node_data[
-                get_key_by_value(self.corner_node_data, self.direction_dict[k], object=True)
+                get_key_by_value(
+                    self.corner_node_data, self.direction_dict[k], object=True
+                )
             ]
             item.name = k
             # assign location with approp direction
@@ -149,13 +150,12 @@ class Boundaries:
         for ix, (k, v) in enumerate(self.corner_node_data.items()):
             # update graph edges
             new_edges = []
-            for node in v.interior_nodes:
-                new_edges.append((v.node, node))
+            for node in v.neighbour_indices:
+                new_edges.append((v.index, node))
                 self.G.add_edges_from(new_edges)
 
             # update embedding
-            self.embed[v.node] = np.array(v.location)
-
+            self.embed[v.index] = np.array(v.location)
 
         planar_check, self.alt_planar_G = nx.check_planarity(self.G)
         if planar_check:
@@ -164,9 +164,9 @@ class Boundaries:
             ic("FAILS PLANAR CHECK!!!!")
 
     def distinguish_corner_nodes(self):
-        corner_node_ix = [v.node for v in self.corner_node_data.values()]
+        corner_node_ix = [v.index for v in self.corner_node_data.values()]
         for ix in self.G.nodes:
             if ix in corner_node_ix:
                 self.G.nodes[ix]["corner_or_interior"] = "corner"
-            else: 
+            else:
                 self.G.nodes[ix]["corner_or_interior"] = "interior"

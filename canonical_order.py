@@ -77,7 +77,7 @@ class CanonicalOrder:
     # helpers
     def get_node_index(self, key):
         dict_key = get_key_by_value(self.corner_node_data, key, object=True)
-        return self.corner_node_data[dict_key].node
+        return self.corner_node_data[dict_key].index
     
     def create_next_graphs(self):
         self.G_k_minus = nx.subgraph(self.G, self.subgraph_nodes)

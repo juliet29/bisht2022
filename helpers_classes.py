@@ -1,10 +1,13 @@
 import networkx as nx
+
+
 # simple classes
 class SeperatingTriangleData:
     def __init__(self, cycle: list, inner_node: int) -> None:
         self.cycle = cycle
         self.inner_node = inner_node
         self.target_edge: tuple = None
+
     # TODO RENAME THIS!!
 
     def __repr__(self):
@@ -27,30 +30,29 @@ class Domain:
 class CornerNode:
     def __init__(
         self,
-        interior_nodes: list[int] = None,
+        neighbour_indices: list[int] = None,  # nodes that this is connected to
         name: str = None,
-        node: int = None,
+        index: int = None,
         location: tuple = None,
         mean_location: tuple = None,
     ) -> None:
-        self.interior_nodes = interior_nodes
+        self.neighbour_indices = neighbour_indices
         self.name = name
-        self.node = node
+        self.index = index
         self.location = location
         self.mean_location = mean_location
 
     def __repr__(self):
         return f"CornerNode({self.__dict__})"
-    
+
+
 class GraphData:
     def __init__(
-        self,
-        graph: nx.Graph,
-        embed: dict,
-        corner_node_data:dict=None
+        self, graph: nx.Graph, embed: dict, corner_node_data: dict = None
     ) -> None:
         self.graph = graph
         self.embed = embed
         self.corner_node_data = corner_node_data
+
     def __repr__(self):
         return f"GraphData{self.__dict__})"
