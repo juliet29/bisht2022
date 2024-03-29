@@ -17,6 +17,7 @@ class RegularEdgeLabeling:
             conencting_corner_nodes = e[0] in corner_indices and e[1] in corner_indices
             if not conencting_corner_nodes:
                 filtered.append(e)
+                
         return filtered
 
     def get_node_edges(self, node_to_find):

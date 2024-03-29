@@ -51,6 +51,7 @@ def find_keys_with_same_value(dictionary):
 
 
 # utilities
+
 def total_length(list_of_lists):
     return sum(len(sublist) for sublist in list_of_lists)
 
@@ -66,6 +67,9 @@ def find_difference(list1, list2):
 
     return difference1, difference2
 
+# geometry 
+def euclidean_distance(coord1, coord2):
+    return np.sqrt((coord1[0] - coord2[0])**2 + (coord1[1] - coord2[1])**2)
 
 def find_line_through_points(point_pair):
     point1, point2 = point_pair  # tuple of coordinate pts
@@ -219,6 +223,8 @@ def assign_directions(coords):
         return directions
     else:
         return directions
+    
+
 
 
 def find_point_along_vector(coord, direction_str, distance):
