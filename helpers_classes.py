@@ -48,11 +48,12 @@ class CornerNode:
 
 class GraphData:
     def __init__(
-        self, graph: nx.Graph, embed: dict, corner_node_data: dict = None
+        self, G:nx.Graph, embed:dict, corner_node_data:dict = None, rel:nx.Graph = None
     ) -> None:
-        self.graph = graph
+        self.G = G
         self.embed = embed
         self.corner_node_data = corner_node_data
+        self.rel = rel
 
     def __repr__(self):
         return f"GraphData{self.__dict__})"
