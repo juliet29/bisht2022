@@ -45,7 +45,7 @@ class Processor:
     def create_rel(self):
         self.r = RegularEdgeLabeling(self.GraphData)
         self.r.run()
-        self.GraphData.rel = self.r.DG
+        self.GraphData.rel = self.r.rel
     
 
     def run(self):
@@ -55,14 +55,3 @@ class Processor:
         self.set_canonical_order()
         self.create_rel()
 
-    # def add_corner_nodes(self):
-
-    #     self.b.organize_cips()
-    #     self.b.distribute_corner_nodes()
-    #     self.b.locate_corner_nodes()
-    #     self.b.connect_corner_nodes()
-    #     self.b.distinguish_corner_nodes()
-    #     # TODO => should have clean thing that is like run_corner_nodes
-
-    # self.b.assign_corner_node_pos()
-    # self.b.four_connect()

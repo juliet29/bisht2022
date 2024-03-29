@@ -54,11 +54,20 @@ class RegularEdgeLabeling:
 
         self.corner_edges = all_correct
 
+    def color_corner_nodes(self):
+        for v in self.corner_node_data.values():
+            if v.name in ["south", "north"]:
+                self.rel.nodes[v.index]["node"] = "T_blue"
+            else:
+                self.rel.nodes[v.index]["node"] = "T_red"
+
 
     def run(self):
         # creating rel 
         self.orient_corner_edges()
         
-        self.DG = nx.DiGraph()
-        self.DG.add_edges_from(self.corner_edges)
+        self.rel = nx.DiGraph()
+        self.rel.add_edges_from(self.corner_edges)
+
+        self.color_corner_nodes()
         pass
