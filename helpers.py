@@ -2,12 +2,24 @@ from helpers_classes import *
 from helpers_plots import *
 
 import itertools
+import inspect 
+
 
 from icecream import ic
 import numpy as np
 
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
+
+
+
+
+def get_calling_function_name():
+    # Get the frame of the calling function-> 2 levels up 
+    frame = inspect.currentframe().f_back.f_back
+    # Get the name of the calling function
+    calling_function_name = frame.f_code.co_name
+    return calling_function_name
 
 
 # dictionary utilities
