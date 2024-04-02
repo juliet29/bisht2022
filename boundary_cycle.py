@@ -11,6 +11,7 @@ class GraphBoundaryCycle:
         self.generate_geometry_from_graph()
         self.get_geometry_boundary()
         self.get_graph_boundary_cycle()
+        self.get_ccw_cycle()
 
 
     def get_emedding_coords(self, embed, arr):
@@ -32,6 +33,11 @@ class GraphBoundaryCycle:
             distances = [euclidean_distance(coord, self.embed[key]) for key in self.embed]
             closest_key = np.argmin(distances)
             self.boundary_cycle.append(closest_key)
+        
+    def get_ccw_cycle(self):
+        temp = copy.copy(self.boundary_cycle)
+        temp.reverse()
 
+        self.ccw_boundary_cycle = temp[:-1]
 
     
