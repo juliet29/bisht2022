@@ -18,7 +18,7 @@ class CanonicalOrder:
         self.find_next_node_and_update()
 
 
-
+    # helpers...
     def get_node_index(self, key):
         dict_key = get_key_by_value(self.corner_node_data, key, object=True)
         return self.corner_node_data[dict_key].index
@@ -38,6 +38,7 @@ class CanonicalOrder:
         a = Augment(self.G_k_minus)
         a.G_biconnect = self.G_k_minus
         a.test_biconnect()
+
 
     # action starts
     def connect_outer_edges(self):
@@ -95,7 +96,7 @@ class CanonicalOrder:
 
                 assert (
                     len(true_candidate_nodes) == 1
-                ), "candidate nodes are invalid!"  # TODO issue arirses bc have sepersting triangles
+                ), "candidate nodes are invalid!"  # TODO issue arirses bc have sepersting triangles, ## check this.. thought that it was if it was three.. 
 
             next_node = true_candidate_nodes[0]
             # ic((true_candidate_nodes, next_node))
