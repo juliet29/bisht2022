@@ -11,6 +11,8 @@ class Processor:
         self.G_init = G
         self.G = self.G_init.copy()
         self.embed = nx.planar_layout(self.G)
+        self.GraphData = GraphData(self.G, self.embed)
+        self.history = [{"init": self.GraphData}]
 
         pass
 
@@ -18,6 +20,7 @@ class Processor:
         self.a = Augment(self.G)
         self.G = self.a.run_augment()
         self.embed = nx.planar_layout(self.G)
+        # GraphData = 
         # TODO check if no change to embedding here because just adding edges.. bc doesnt seem to be the case..
 
     def fix_separating_triangles(self):
