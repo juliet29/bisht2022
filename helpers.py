@@ -1,9 +1,9 @@
 from helpers_classes import *
 from helpers_plots import *
 
-import itertools
+
 import inspect 
-import copy
+from itertools import tee
 
 
 from icecream import ic
@@ -14,7 +14,7 @@ import plotly.graph_objects as go
 
 
 
-
+# self- knowlegde 
 def get_calling_function_name():
     # Get the frame of the calling function-> 2 levels up 
     frame = inspect.currentframe().f_back.f_back
@@ -22,6 +22,15 @@ def get_calling_function_name():
     calling_function_name = frame.f_code.co_name
     return calling_function_name
 
+
+# list utilities 
+def pairwise(iterable):
+    a, b = tee(iterable)
+    next(b, None)
+    return zip(a, b)
+
+def flatten_list(input_list):
+    return [item for sublist in input_list for item in sublist]
 
 # dictionary utilities
 def any_attribute_matches_value(obj, value):
@@ -190,8 +199,11 @@ def furthest_coordinate(coord1, coord2, direction):
             return coord1
         elif comp1 < comp2:
             return coord2
+        elif comp1 == comp2:
+            ic("Both coordinates are equidistant in the specified direction")
+            return coord2
         else:
-            return "Both coordinates are equidistant in the specified direction"
+            return "Error when getting furthes coord"
     else:
         return "Invalid direction"
 
@@ -219,7 +231,7 @@ def assign_directions(coords):
 
     # edge case 
     if find_keys_with_same_value(directions): 
-        ic(directions)
+        # ic(directions)
         missing_coord = list(set(coords) - set([v for v in directions.values()]))[0]
         double_count_coord = list(find_keys_with_same_value(directions).keys())[0]
     
@@ -231,7 +243,7 @@ def assign_directions(coords):
         leftover = set([missing_coord, double_count_coord]) - set([res])
         directions[dir2] = list(leftover)[0]
 
-        ic(directions)
+        ic("When assigning corner node directions, had to reshuffle")
 
         return directions
     else:

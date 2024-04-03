@@ -60,6 +60,6 @@ class Processor:
     def run(self):
         self.augment()
         self.fix_separating_triangles()
-        self.fix_cips_and_add_corner_nodes()
+        # self.fix_cips_and_add_corner_nodes()
         # self.set_canonical_order()
         # self.create_rel()

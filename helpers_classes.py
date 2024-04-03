@@ -44,6 +44,7 @@ class CornerNode:
 
     def __repr__(self):
         return f"CornerNode({self.__dict__})"
+    
 
 
 class GraphData:

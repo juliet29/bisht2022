@@ -135,11 +135,7 @@ class Boundaries:
 
         for k, v in self.direction_dict.items():
             # match items in four_con dictionary to the direction dict
-            item = self.corner_node_data[
-                get_key_by_value(
-                    self.corner_node_data, self.direction_dict[k], object=True
-                )
-            ]
+            item = self.corner_node_data[get_key_by_value(self.corner_node_data, v, object=True)]
             item.name = k
             # assign location with approp direction
             item.location = find_point_along_vector(item.mean_location, k, buffer)
