@@ -57,7 +57,6 @@ class FourComplete:
     # action begins 
     def get_boundary_cyle(self):
         g = BoundaryCycle(self.data)
-        g.run()
         self.boundary = g.ccw_boundary_cycle
         
 

@@ -1,4 +1,6 @@
 import networkx as nx
+import os 
+import pickle
 
 
 def plot_planar_embed(embed: nx.PlanarEmbedding):
@@ -23,6 +25,17 @@ def plot_just_planar(G: nx.Graph, pos=None):
 
 
 ## special starting graphs
+
+def get_saved_graph_data(type=None):
+    path = "saved_graphs/after_sep_tri"
+    
+    if type == "BOTTOM":
+        final_path = os.path.join(path, "bottom_node", "data.p")
+    else:
+        final_path = os.path.join(path, "side_node", "data.p")
+    
+    res = pickle.load(open(final_path, "rb") )
+    return res
 
 
 def graph_from_edges(edges):

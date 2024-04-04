@@ -11,6 +11,8 @@ class BoundaryCycle:
         self.G = GraphData.G
         self.embed = GraphData.embed
 
+        self.run()
+
     def run(self):
         self.generate_geometry_from_graph()
         self.get_geometry_boundary()
