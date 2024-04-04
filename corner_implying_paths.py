@@ -12,6 +12,7 @@ class CornerImplyingPaths:
         self.G = GraphData.G
         self.boundary = None
         
+    # helpers 
 
     def get_boundary(self):
         if not self.boundary:
@@ -19,24 +20,53 @@ class CornerImplyingPaths:
             self.boundary = g.ccw_boundary_cycle
 
 
+    def path_in_boundary_cylce(self, path):
+        path_edges = {(path[i], path[i + 1]) for i in range(len(path) - 1)}
+
+        froze_path, froze_cycle = freeze_sets(path_edges, self.boundary_cycle_edges)
+
+        return froze_path.issubset(froze_cycle)
+
+    def path_interior_is_not_shortcut(self, path):
+        shortcut_nodes = {number for tuple in self.shortcuts for number in tuple}
+        path_interior = path[1:-1]
+        for p in path_interior:
+            if p in shortcut_nodes:
+                return False
+        return True
+        
+
+    # action 
+
     def get_shortcuts(self):
         if not self.boundary:
             self.get_boundary()
         ic(self.boundary)
         
         # get all edges involving 2 nodes on the boundary 
-        subgraph = self.G.subgraph(self.boundary)
+        self.subgraph = self.G.subgraph(self.boundary)
 
         # get edges in boundary cycle.. 
         boundary_cycle_graph = nx.cycle_graph(self.boundary)
-        boundary_cycle_edges = boundary_cycle_graph.edges()
+        self.boundary_cycle_edges = boundary_cycle_graph.edges()
 
-        # compare to find shortcuts 
-        cycle_edges_frozen = {frozenset(t) for t in boundary_cycle_edges}
-        subgraph_edges_frozen = {frozenset(t) for t in subgraph.edges}
+        # compare to find shortcuts
+        a, b = freeze_sets(self.boundary_cycle_edges,self.subgraph.edges)
+        difference = b - a
 
-        difference = subgraph_edges_frozen - cycle_edges_frozen
+        self.shortcuts = [tuple(i) for i in difference]
 
-        self.shortcuts = {tuple(fs) for fs in difference}
 
-        
+    def get_cips(self):
+        # bisht -> reqs for corner implying path 
+        self.cips = []
+
+        for shortcut in self.shortcuts:
+            # u1, un must be a shortcut 
+            for path in nx.all_simple_paths(self.subgraph, shortcut[0], shortcut[1]):
+                # has to be on outer boundary 
+                if self.path_in_boundary_cylce(path):
+                    # intervening nodes must not be endpoints in any shortcut 
+                    if self.path_interior_is_not_shortcut(path):
+                        self.cips.append(path)
+                        ic("A CIP", path)

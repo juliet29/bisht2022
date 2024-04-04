@@ -33,6 +33,14 @@ def flatten_list(input_list):
     return [item for sublist in input_list for item in sublist]
 
 
+# set utilities
+def freeze_sets(set1, set2):
+    a = {frozenset(t) for t in set1}
+    b = {frozenset(t) for t in set2}
+
+    return a, b
+
+
 
 
 
