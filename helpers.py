@@ -2,7 +2,7 @@ from helpers_classes import *
 from helpers_plots import *
 
 
-import inspect 
+import inspect
 from itertools import tee
 
 
@@ -13,38 +13,36 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 
 
-
-# self- knowlegde 
+# self- knowlegde
 def get_calling_function_name():
-    # Get the frame of the calling function-> 2 levels up 
+    # Get the frame of the calling function-> 2 levels up
     frame = inspect.currentframe().f_back.f_back
     # Get the name of the calling function
     calling_function_name = frame.f_code.co_name
     return calling_function_name
 
 
-# list utilities 
+# list utilities
 def pairwise(iterable):
     a, b = tee(iterable)
     next(b, None)
     return zip(a, b)
+
 
 def flatten_list(input_list):
     return [item for sublist in input_list for item in sublist]
 
 
 # set utilities
-def freeze_sets(set1, set2):
+def freeze_list_of_tuples(set1, set2):
     a = {frozenset(t) for t in set1}
     b = {frozenset(t) for t in set2}
 
     return a, b
 
 
-
-
-
 # dictionary utilities
+
 
 def get_dict_subset(dict, keys_to_select):
     return {key: dict[key] for key in keys_to_select}
@@ -67,6 +65,7 @@ def get_key_by_value(dictionary, value, object=False):
                 return key
     return None
 
+
 def find_keys_with_same_value(dictionary):
     # Initialize a dictionary to store keys by their values
     keys_by_value = {}
@@ -82,17 +81,19 @@ def find_keys_with_same_value(dictionary):
             keys_by_value[value] = [key]
 
     # Filter out values with only one key associated with them
-    keys_with_same_value = {value: keys for value, keys in keys_by_value.items() if len(keys) > 1}
+    keys_with_same_value = {
+        value: keys for value, keys in keys_by_value.items() if len(keys) > 1
+    }
 
     return keys_with_same_value
 
 
-
-
 # utilities
+
 
 def total_length(list_of_lists):
     return sum(len(sublist) for sublist in list_of_lists)
+
 
 def find_difference(list1, list2):
     set1 = set(list1)
@@ -106,9 +107,11 @@ def find_difference(list1, list2):
 
     return difference1, difference2
 
-# geometry 
+
+# geometry
 def euclidean_distance(coord1, coord2):
-    return np.sqrt((coord1[0] - coord2[0])**2 + (coord1[1] - coord2[1])**2)
+    return np.sqrt((coord1[0] - coord2[0]) ** 2 + (coord1[1] - coord2[1]) ** 2)
+
 
 def find_line_through_points(point_pair):
     point1, point2 = point_pair  # tuple of coordinate pts
@@ -156,19 +159,20 @@ def find_min_max_coordinates(coordinates):
     x_coords = coordinates_array[:, 0]
     y_coords = coordinates_array[:, 1]
 
-
     # Find min and max values for x and y coordinates
-    d = Domain(x_min=np.min(x_coords), 
-               x_max=np.max(x_coords), 
-               y_min=np.min(y_coords),
-               y_max=np.max(y_coords))
+    d = Domain(
+        x_min=np.min(x_coords),
+        x_max=np.max(x_coords),
+        y_min=np.min(y_coords),
+        y_max=np.max(y_coords),
+    )
 
     return d
 
 
 def check_point_in_hull(domain: Domain, point):
     x, y = point
-    
+
     return domain.x_min < x < domain.x_max and domain.y_min < y < domain.y_max
 
 
@@ -199,10 +203,10 @@ def new_node_pos(n1, n2):
 def furthest_coordinate(coord1, coord2, direction):
     # Define a dictionary mapping directions to coordinate components
     direction_mapping = {
-        'north': lambda coord: coord[1],
-        'south': lambda coord: -coord[1],
-        'east': lambda coord: coord[0],
-        'west': lambda coord: -coord[0]
+        "north": lambda coord: coord[1],
+        "south": lambda coord: -coord[1],
+        "east": lambda coord: coord[0],
+        "west": lambda coord: -coord[0],
     }
 
     # Check if the provided direction is valid
@@ -244,14 +248,14 @@ def assign_directions(coords):
             # ic(coord, "west")
             west = coord
 
-    directions = {'north': north, 'south': south, 'east': east, 'west': west}
+    directions = {"north": north, "south": south, "east": east, "west": west}
 
-    # edge case 
-    if find_keys_with_same_value(directions): 
+    # edge case
+    if find_keys_with_same_value(directions):
         # ic(directions)
         missing_coord = list(set(coords) - set([v for v in directions.values()]))[0]
         double_count_coord = list(find_keys_with_same_value(directions).keys())[0]
-    
+
         dir1, dir2 = list(find_keys_with_same_value(directions).values())[0]
 
         res = furthest_coordinate(missing_coord, double_count_coord, dir1)
@@ -265,22 +269,22 @@ def assign_directions(coords):
         return directions
     else:
         return directions
-    
-
 
 
 def find_point_along_vector(coord, direction_str, distance):
     # Define direction vectors for cardinal directions
     direction_vectors = {
-        'north': np.array([0, 1]),
-        'south': np.array([0, -1]),
-        'east': np.array([1, 0]),
-        'west': np.array([-1, 0])
+        "north": np.array([0, 1]),
+        "south": np.array([0, -1]),
+        "east": np.array([1, 0]),
+        "west": np.array([-1, 0]),
     }
 
     # Check if direction string is valid
     if direction_str not in direction_vectors:
-        raise ValueError("Invalid direction string. Please use 'north', 'south', 'east', or 'west'.")
+        raise ValueError(
+            "Invalid direction string. Please use 'north', 'south', 'east', or 'west'."
+        )
 
     # Get direction vector based on the input string
     direction = direction_vectors[direction_str]
@@ -289,5 +293,3 @@ def find_point_along_vector(coord, direction_str, distance):
     new_point = tuple(coord + direction * distance)
 
     return new_point
-
-

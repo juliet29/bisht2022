@@ -1,8 +1,16 @@
 from helpers import *
 from boundary_cycle import *
+from corner_implying_paths import *
 
 from itertools import cycle
 import random 
+
+def contains_sublist(larger_list, smaller_list):
+    n = len(smaller_list)
+    for i in range(len(larger_list) - n + 1):
+        if larger_list[i:i+n] == smaller_list:
+            return True
+    return False
 
 
 class FourComplete:
@@ -29,6 +37,7 @@ class FourComplete:
         self.get_boundary_cyle()
         self.generate_dividing_indices()
         self.divide_boundary_cycle()
+        self.ensure_no_cips()
     
     def run_to_completion(self):
         self.assign_corner_nodes()
@@ -54,6 +63,22 @@ class FourComplete:
          assert nx.is_chordal(self.G), "Four completed graph ia not triangulated "
 
 
+    def check_for_cips(self):  # helper function 
+        c = CornerImplyingPaths(self.data)
+        assert c.boundary == self.boundary # TODO actually fix in data object 
+
+        for path in self.paths:
+            for cip in c.arranged_cips:
+                try:
+                    overlap = contains_sublist(path, cip)
+                    if overlap:
+                        ic(cip, path, "NEED to adjust division")
+                        return True
+                except:
+                    pass
+        return False
+    
+
     # action begins 
     def get_boundary_cyle(self):
         g = BoundaryCycle(self.data)
@@ -71,7 +96,7 @@ class FourComplete:
 
         self.dividing_indices.sort()
 
-
+    
 
     def divide_boundary_cycle(self):
         cycled_dividing_indices = cycle(self.dividing_indices)
@@ -90,6 +115,21 @@ class FourComplete:
                 break
         
         self.assert_correct_division()
+
+    
+    def ensure_no_cips(self):
+        n = len(self.boundary)
+        cntr = 1
+
+        for i in range(10):
+            if self.check_for_cips():
+                cntr+=1
+                ic(i, self.paths, "found cips")
+                # update dividing indices, divide boundary cycle and continue checking until passes
+                self.dividing_indices = [(i+cntr)%n for i in self.dividing_indices]
+                self.divide_boundary_cycle()
+            else:
+                return
 
 
     def assign_corner_nodes(self):
