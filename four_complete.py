@@ -25,8 +25,19 @@ class FourComplete:
         self.assert_planarity()
         # self.assert_triangulated()
     
-    def try_corner_nodes(self):
-        pass
+    def run_to_division(self):
+        self.get_boundary_cyle()
+        self.generate_dividing_indices()
+        self.divide_boundary_cycle()
+    
+    def run_to_completion(self):
+        self.assign_corner_nodes()
+        self.connect_corner_nodes()
+        
+        self.locate_corner_nodes()
+        # self.connect_outer_nodes()
+
+        self.assert_planarity()
 
 
     # TODO helpers? 

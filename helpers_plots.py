@@ -31,7 +31,7 @@ def graph_from_edges(edges):
     return G
 
 
-def st_graph(seed):
+def st_graph(seed=4):
     order_a = 4
     order_b = 4
     G_a = nx.random_regular_graph(3, order_a, seed)
