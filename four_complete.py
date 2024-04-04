@@ -21,17 +21,8 @@ class FourComplete:
         self.embed = GraphData.embed
 
     def run(self):
-        self.get_boundary_cyle()
-        self.generate_dividing_indices()
-        self.divide_boundary_cycle()
-        self.assign_corner_nodes()
-        self.connect_corner_nodes()
-        
-        self.locate_corner_nodes()
-        # self.connect_outer_nodes()
-
-        self.assert_planarity()
-        # self.assert_triangulated()
+        self.run_to_division()
+        self.run_to_completion()
     
     def run_to_division(self):
         self.get_boundary_cyle()
@@ -121,7 +112,7 @@ class FourComplete:
         n = len(self.boundary)
         cntr = 1
 
-        for i in range(10):
+        for i in range(n):
             if self.check_for_cips():
                 cntr+=1
                 ic(i, self.paths, "found cips")
@@ -130,6 +121,8 @@ class FourComplete:
                 self.divide_boundary_cycle()
             else:
                 return
+        raise Exception("Did not find four completion without separating triangles!")
+        
 
 
     def assign_corner_nodes(self):

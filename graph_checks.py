@@ -1,5 +1,7 @@
 from helpers import *
 
+
+# checks 
 def is_triangulated(G: nx.Graph):
     not_chordal = {}
     for ix, c in enumerate(nx.simple_cycles(G=G, length_bound=4)):
@@ -30,5 +32,22 @@ def check_seperating_triangle(G):
     # if self.DEBUG:
     # ic(len(l3_cycles), m, n, m - n + 1)
     ic(f"\n {len(l3_cycles)} three cycles ?= {m - n + 1}, where m={m}, n={n}")
-    return False
+    return len(l3_cycles) == m - n + 1
 
+
+def check_triangulated_interior(G):
+    for e in G.edges:
+        if not check_shared_neighbour(G, e):
+            return False
+    return True
+
+
+
+# helpers
+def check_shared_neighbour(G, e):
+    u, v  = e
+    for node in G.nodes:
+        if (node, u) in G.edges and (node, v) in G.edges:
+            # ic((node,v), (node,u))
+            return True
+    return False
