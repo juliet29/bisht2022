@@ -32,7 +32,16 @@ def pairwise(iterable):
 def flatten_list(input_list):
     return [item for sublist in input_list for item in sublist]
 
+
+
+
+
 # dictionary utilities
+
+def get_dict_subset(dict, keys_to_select):
+    return {key: dict[key] for key in keys_to_select}
+
+
 def any_attribute_matches_value(obj, value):
     for attr_name in vars(obj):  # Get all attributes of the object
         if getattr(obj, attr_name) == value:
