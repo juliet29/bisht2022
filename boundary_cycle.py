@@ -3,6 +3,8 @@ from helpers import *
 import shapely as sp
 import copy 
 
+import traceback
+
 
 class BoundaryCycle:
     """Gives cycle of a given boundary in clockwise order"""
@@ -14,10 +16,15 @@ class BoundaryCycle:
         self.run()
 
     def run(self):
-        self.generate_geometry_from_graph()
-        self.get_geometry_boundary()
-        self.get_graph_boundary_cycle()
-        self.get_ccw_cycle()
+        try:
+            self.generate_geometry_from_graph()
+            self.get_geometry_boundary()
+            self.get_graph_boundary_cycle()
+            self.get_ccw_cycle()
+        except Exception as e: 
+            traceback.print_exc()
+
+        #exception handling code
 
     def get_emedding_coords(self, embed, arr):
         return [embed[i] for i in arr]
@@ -37,8 +44,9 @@ class BoundaryCycle:
         self.boundary_line_string = sp.unary_union(complete_faces).boundary
 
     def get_graph_boundary_cycle(self):
-        self.boundary_cycle = []
         coords = [i for i in self.boundary_line_string.coords]
+
+        self.boundary_cycle = []
         for coord in coords:
             distances = [
                 euclidean_distance(coord, self.embed[key]) for key in self.embed
