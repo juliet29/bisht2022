@@ -1,14 +1,17 @@
 from helpers import *
 
-from shapely import LineString, Point
+from shapely import LineString, Point, Polygon
 
 
 class FourCompleteCoordinates:
-    def __init__(self, GraphData: GraphData, path: list, distance:float = 0.5) -> None:
+    def __init__(self, GraphData: GraphData, path: list, boundary_shape, distance:float = 0.5) -> None:
         self.data = GraphData
         self.G = GraphData.G
         self.embed = GraphData.embed
+
         self.path = path
+        self.boundary_shape = boundary_shape
+
         self.distance = distance
 
         self.create_corner_node_location()
@@ -19,7 +22,7 @@ class FourCompleteCoordinates:
         self.choose_best_slope()
         self.choose_best_midpoint()
         self.define_corner_node_axis()
-        self.corner_node_location = (self.orthog_line.centroid.x, self.orthog_line.centroid.y)
+        
 
 
     def get_slopes(self):
@@ -68,18 +71,33 @@ class FourCompleteCoordinates:
         self.midpoint = line.centroid
 
     def define_corner_node_axis(self):
-        self.orthog_line = line_from_point_and_slope(
-            self.midpoint, orthogonal_slope(self.most_freq_slope), self.distance
+        self.orthog_line = self.create_axis()
+
+        # if line crosses existing of graph shapes, flip it 
+        if Polygon(self.boundary_shape).contains(self.orthog_line.centroid):
+            ic("flipped")
+            self.orthog_line = self.create_axis(dir=-1)
+
+        self.corner_node_location = (self.orthog_line.centroid.x, self.orthog_line.centroid.y)
+        
+
+    def create_axis(self, dir=1):
+        line = line_from_point_and_slope(
+            self.midpoint, orthogonal_slope(self.most_freq_slope), dir*self.distance
         )
+        return line
 
 
 
 # MARK: helpers
 def line_from_point_and_slope(point, slope, length=10):
     # Calculate the second point using the given point and slope
-    x2 = point.x + length
-    y2 = point.y + length * slope
-    second_point = Point(x2, y2)
+    if slope == 0:
+        second_point = Point(x2, y2+length)
+    else:
+        x2 = point.x + length
+        y2 = point.y + length * slope
+        second_point = Point(x2, y2)
 
     # Create a LineString from the two points
     line = LineString([point, second_point])
@@ -89,5 +107,7 @@ def line_from_point_and_slope(point, slope, length=10):
 def orthogonal_slope(slope):
     if slope != 0:
         return -1 / slope
-    else:
+    elif slope == 0:
         return 0
+    else:
+        raise Exception("vertical slope not implmented for four completion location")

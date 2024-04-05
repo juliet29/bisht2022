@@ -4,11 +4,12 @@ from four_complete_coordinates import *
 
 
 class FourCompleteLocations:
-    def __init__(self, GraphData: GraphData, boundary:list, paths:list) -> None:
+    def __init__(self, GraphData: GraphData, boundary:list, paths:list, boundary_shape) -> None:
         self.data = GraphData
         self.G = GraphData.G
         self.embed = GraphData.embed
         self.boundary = boundary
+        self.boundary_shape = boundary_shape
         self.paths  = paths
 
         self.corner_node_data = []
@@ -21,7 +22,7 @@ class FourCompleteLocations:
 
     def get_corner_node_coordinates(self):
         for ix, p in enumerate(self.paths):
-            l = FourCompleteCoordinates(self.data, p)
+            l = FourCompleteCoordinates(self.data, p, self.boundary_shape)
             self.corner_node_data.append(CornerNode(
                 location=l.corner_node_location,
                 index = len(self.G.nodes) + ix,
