@@ -91,6 +91,38 @@ def find_keys_with_same_value(dictionary):
 
 # utilities
 
+def find_westernmost_point(coordinates):
+    # Initialize variables to store the westernmost point
+    westernmost_point = None
+    min_longitude = float('inf')
+
+    # Iterate through the coordinates
+    for coordinate in coordinates:
+        longitude = coordinate[0]  # Get the longitude (x-coordinate)
+        if longitude < min_longitude:
+            min_longitude = longitude
+            westernmost_point = coordinate
+
+    return westernmost_point
+
+
+def clockwise_order(coordinates):
+    # Calculate the centroid of the coordinates
+    centroid_x = sum(x for x, y in coordinates) / len(coordinates)
+    centroid_y = sum(y for x, y in coordinates) / len(coordinates)
+    centroid = Point(centroid_x, centroid_y)
+
+    # Calculate the angle between each coordinate and the centroid
+    angles = [(math.atan2(y - centroid.y, x - centroid.x), x, y) for x, y in coordinates]
+
+    # Sort the coordinates based on the angles
+    sorted_coordinates = sorted(angles)
+
+    # Extract the sorted coordinates without the angles
+    clockwise_ordered_coordinates = [(x, y) for angle, x, y in sorted_coordinates]
+
+    return clockwise_ordered_coordinates
+
 
 def total_length(list_of_lists):
     return sum(len(sublist) for sublist in list_of_lists)

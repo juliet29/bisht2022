@@ -3,25 +3,27 @@ from icecream import ic
 from helpers import *
 from augment import *
 
+from helpers_classes import *
+
 
 class CanonicalOrder:
     def __init__(self, GraphData: GraphData) -> None:
         self.G = GraphData.G
         self.embed = GraphData.embed
-        self.corner_node_data = GraphData.corner_node_data
+        self.corner_node_dict = GraphData.corner_node_dict
         self.order = None
         self.diff_graph_state = {}
 
     def run(self):
-        self.connect_outer_edges()
+        # self.connect_outer_edges()
         self.initialize_order()
         self.find_next_node_and_update()
 
 
     # helpers...
     def get_node_index(self, key):
-        dict_key = get_key_by_value(self.corner_node_data, key, object=True)
-        return self.corner_node_data[dict_key].index
+        dict_key = get_key_by_value(self.corner_node_dict, key, object=True)
+        return self.corner_node_dict[dict_key].index
 
     def create_next_graphs(self):
         self.G_k_minus = nx.subgraph(self.G, self.subgraph_nodes)
@@ -40,18 +42,18 @@ class CanonicalOrder:
         a.test_biconnect()
 
 
-    # action starts
-    def connect_outer_edges(self):
-        # TODO move to own four connect class?
-        ix = self.get_node_index  # create alias
-        edges = [
-            (ix("south"), ix("east")),
-            (ix("east"), ix("north")),
-            (ix("north"), ix("west")),
-            (ix("west"), ix("south")),
-            (ix("south"), ix("north")),
-        ]
-        self.G.add_edges_from(edges)
+    # # action starts
+    # def connect_outer_edges(self):
+    #     # TODO move to own four connect class?
+    #     ix = self.get_node_index  # create alias
+    #     edges = [
+    #         (ix("south"), ix("east")),
+    #         (ix("east"), ix("north")),
+    #         (ix("north"), ix("west")),
+    #         (ix("west"), ix("south")),
+    #         (ix("south"), ix("north")),
+    #     ]
+    #     self.G.add_edges_from(edges)
 
 
     def initialize_order(self):
