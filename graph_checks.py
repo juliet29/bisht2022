@@ -1,5 +1,10 @@
 from helpers import *
 
+def check_graph(G):
+    check_triangulated_interior(G)
+    alt_embed = check_planarity(G)
+    check_seperating_triangle(G)
+
 def check_planarity(G):
     planar_check, alt_embed = nx.check_planarity(G)
     assert planar_check, "Four completed graph is not planar "

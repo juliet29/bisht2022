@@ -5,6 +5,7 @@ from helpers_plots import *
 import inspect
 from itertools import tee
 from collections import OrderedDict
+import math 
 
 
 from icecream import ic
@@ -89,7 +90,7 @@ def find_keys_with_same_value(dictionary):
     return keys_with_same_value
 
 
-# utilities
+#MARK: utilities
 
 def find_westernmost_point(coordinates):
     # Initialize variables to store the westernmost point
@@ -106,22 +107,7 @@ def find_westernmost_point(coordinates):
     return westernmost_point
 
 
-def clockwise_order(coordinates):
-    # Calculate the centroid of the coordinates
-    centroid_x = sum(x for x, y in coordinates) / len(coordinates)
-    centroid_y = sum(y for x, y in coordinates) / len(coordinates)
-    centroid = Point(centroid_x, centroid_y)
 
-    # Calculate the angle between each coordinate and the centroid
-    angles = [(math.atan2(y - centroid.y, x - centroid.x), x, y) for x, y in coordinates]
-
-    # Sort the coordinates based on the angles
-    sorted_coordinates = sorted(angles)
-
-    # Extract the sorted coordinates without the angles
-    clockwise_ordered_coordinates = [(x, y) for angle, x, y in sorted_coordinates]
-
-    return clockwise_ordered_coordinates
 
 
 def total_length(list_of_lists):
