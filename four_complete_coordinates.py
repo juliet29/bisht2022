@@ -10,7 +10,7 @@ class FourCompleteCoordinates:
         self.embed = GraphData.embed
 
         self.path = path
-        self.boundary_shape = boundary_shape
+        self.boundary_shape = Polygon(boundary_shape)
 
         self.distance = distance
 
@@ -74,7 +74,7 @@ class FourCompleteCoordinates:
         self.orthog_line = self.create_axis()
 
         # if line crosses existing of graph shapes, flip it 
-        if Polygon(self.boundary_shape).contains(self.orthog_line.centroid):
+        if self.boundary_shape.contains(self.orthog_line.centroid) or self.boundary_shape.crosses(self.orthog_line):
             ic("flipped")
             self.orthog_line = self.create_axis(dir=-1)
 
@@ -92,12 +92,15 @@ class FourCompleteCoordinates:
 # MARK: helpers
 def line_from_point_and_slope(point, slope, length=10):
     # Calculate the second point using the given point and slope
-    if slope == 0:
+    x2 = point.x + length
+    y2 = point.y + length * slope
+    if slope != 0:
+        second_point = Point(x2, y2)
+    elif slope==0:
+        ic("slope is 0")
         second_point = Point(x2, y2+length)
     else:
-        x2 = point.x + length
-        y2 = point.y + length * slope
-        second_point = Point(x2, y2)
+        raise Exception("vertical slope not implmented for four completion location")
 
     # Create a LineString from the two points
     line = LineString([point, second_point])
