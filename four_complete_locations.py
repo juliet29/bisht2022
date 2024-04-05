@@ -1,6 +1,7 @@
 from helpers import *
 
-from four_complete_coordinates import *
+# from four_complete_coordinates import *
+from four_complete_buffer import *
 
 
 class FourCompleteLocations:
@@ -22,7 +23,7 @@ class FourCompleteLocations:
 
     def get_corner_node_coordinates(self):
         for ix, p in enumerate(self.paths):
-            l = FourCompleteCoordinates(self.data, p, self.boundary_shape)
+            l = FourCompleteBuffer(self.data, p, self.boundary_shape)
             self.corner_node_data.append(CornerNode(
                 location=l.corner_node_location,
                 index = len(self.G.nodes) + ix,

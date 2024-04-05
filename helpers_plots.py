@@ -1,6 +1,10 @@
 import networkx as nx
 import os 
 import pickle
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import plotly.express as px
+
 
 def points_to_plot(coords):
     x = [c[0] for c in coords]
