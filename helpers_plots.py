@@ -2,6 +2,10 @@ import networkx as nx
 import os 
 import pickle
 
+def points_to_plot(coords):
+    x = [c[0] for c in coords]
+    y  = [c[1] for c in coords]
+    return x, y
 
 def plot_planar_embed(embed: nx.PlanarEmbedding):
     pos = nx.combinatorial_embedding_to_pos(embed)

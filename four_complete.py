@@ -73,8 +73,7 @@ class FourComplete:
         for i in range(n):
             if self.check_for_cips():
                 cntr+=1
-                ic(i, self.paths, "found cips")
-                # update dividing indices, divide boundary cycle and continue checking until passes
+                # ic(i, self.paths, "found cips")
                 self.dividing_indices = [(i+cntr)%n for i in self.dividing_indices]
                 self.divide_boundary_cycle()
             else:
@@ -85,16 +84,23 @@ class FourComplete:
     def check_for_cips(self):  # helper function 
         c = CornerImplyingPaths(self.data)
         assert c.boundary == self.boundary # TODO actually fix in data object 
+        self.cips = c.cips
+        # ic(self.cips)
 
-        for path in self.paths:
-            for cip in c.arranged_cips:
-                try:
-                    overlap = contains_sublist(path, cip)
-                    if overlap:
-                        ic(cip, path, "NEED to adjust division")
-                        return True
-                except:
+        for p in self.paths:
+            for cip in c.cips:
+                if len(cip) > len(p):
+                    # ic("skipping", p, cip)
                     pass
+                else:
+                    # ic("evaluating", p, cip)
+                    if contains_sublist(p, cip):
+                        ic('found cips - contains')
+                        return True
+                    elif contains_sublist(p, cip[::-1]):
+                        ic('found cips - contains reverse')
+                        return True
+
         return False
         
 
@@ -118,6 +124,7 @@ class FourComplete:
 #MARK: helper functions 
 
 def contains_sublist(larger_list, smaller_list):
+    # ic(larger_list, smaller_list)
     n = len(smaller_list)
     for i in range(len(larger_list) - n + 1):
         if larger_list[i:i+n] == smaller_list:

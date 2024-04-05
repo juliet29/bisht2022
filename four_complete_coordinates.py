@@ -73,10 +73,16 @@ class FourCompleteCoordinates:
     def define_corner_node_axis(self):
         self.orthog_line = self.create_axis()
 
-        # if line crosses existing of graph shapes, flip it 
-        if self.boundary_shape.contains(self.orthog_line.centroid) or self.boundary_shape.crosses(self.orthog_line):
+        # if end point is in line.. 
+        if self.boundary_shape.contains(self.orthog_line.centroid):
             ic("flipped")
             self.orthog_line = self.create_axis(dir=-1)
+
+        # if slope is 0, and the line is crossing, there could be a more optimal pairing 
+        if self.boundary_shape.crosses(self.orthog_line) and self.most_freq_slope == 0:
+            self.orthog_line = self.create_axis(dir=-1)
+
+
 
         self.corner_node_location = (self.orthog_line.centroid.x, self.orthog_line.centroid.y)
         
