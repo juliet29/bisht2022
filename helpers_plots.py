@@ -24,7 +24,7 @@ def plot_just_planar(G: nx.Graph, pos=None):
         nx.draw_networkx(G)
 
 
-## special starting graphs
+#MARK: special starting graphs
 
 def get_saved_graph_data(type=None):
     path = "saved_graphs/after_sep_tri"
@@ -36,6 +36,7 @@ def get_saved_graph_data(type=None):
     
     res = pickle.load(open(final_path, "rb") )
     return res
+
 
 
 def graph_from_edges(edges):
