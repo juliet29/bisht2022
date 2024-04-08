@@ -3,6 +3,8 @@ from augment import *
 
 from helpers_classes import *
 
+from four_complete_locations import *
+
 
 class KantCanonicalOrder:
     def __init__(self, GraphData: GraphData) -> None:
@@ -14,14 +16,14 @@ class KantCanonicalOrder:
 
 
     def initialize_order(self):
-        self.subgraph_nodes = []
+        for number in list(range(3)):
+            node_index = get_index_by_cardinal_direction(CardinalDirections(number), self.corner_node_dict) # TODO -> put this in a different class..
 
-        self.G.nodes[self.get_node_index("south")]["canonical_order"] = 1
-        self.G.nodes[self.get_node_index("west")]["canonical_order"] = 2
-        self.subgraph_nodes.extend(
-            [self.get_node_index("south"), self.get_node_index("west")]
-        )
+            if number < 2:
+                order = number + 1
+            else:
+                order = len(self.G.nodes)
 
-        self.G_k_minus, self.G_diff = self.create_next_graphs()
+            self.G.nodes[node_index]["canonical_order_data"] = NodeCanonicalOrder(index=node_index, order=order)
 
     

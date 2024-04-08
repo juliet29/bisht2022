@@ -4,6 +4,12 @@ import pickle
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.express as px
+from pprint import pprint
+
+def show_graph_attributes(G:nx.Graph):
+    for node, data in G.nodes.data():
+        pprint(f"Node {node}: {data}")
+
 
 
 def points_to_plot(coords):

@@ -90,15 +90,11 @@ class FourComplete:
         for p in self.paths:
             for cip in c.cips:
                 if len(cip) > len(p):
-                    # ic("skipping", p, cip)
                     pass
                 else:
-                    # ic("evaluating", p, cip)
                     if contains_sublist(p, cip):
-                        ic('found cips - contains')
                         return True
                     elif contains_sublist(p, cip[::-1]):
-                        ic('found cips - contains reverse')
                         return True
 
         return False

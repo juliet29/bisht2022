@@ -90,3 +90,30 @@ class ListHistoryTracker:
 
     def get_history(self):
         return self.history
+    
+
+class NodeCanonicalOrder:
+    def __init__(self, index:int, order:int) -> None:
+        self.index = index # node index in the graph .. 
+        self.order = order
+
+        self.mark = False
+        self.visited = 0
+        self.chords = -100
+
+
+    def __repr__(self):
+        return f"NodeCanonicalOrder({self.__dict__})"
+    
+    def update_mark(self):
+        self.mark = True
+    
+    def update_visited(self):
+        # find this nodes neighbours, and count the number where visited is true 
+        pass
+
+    def update_chords(self):
+        # need to have the exterior face of subgraph induced by V- {u < V | Mark(u) == true}
+        # need to see the chords within this graph 
+        # need to see the number indicdent to this node 
+        pass

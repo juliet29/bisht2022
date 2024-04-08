@@ -67,7 +67,7 @@ class FourCompleteLocations:
         }
         self.data.corner_node_dict = self.corner_node_dict
         # TODO move to own four connect class?
-        ix = self.get_index_by_cardinal_direction  # create alias
+        ix = self.local_get_index_by_cardinal_direction  # create alias
         edges = [
             (ix(CardinalDirections.SOUTH), ix(CardinalDirections.EAST)),
             (ix(CardinalDirections.EAST), ix(CardinalDirections.NORTH)),
@@ -78,21 +78,19 @@ class FourCompleteLocations:
         self.G.add_edges_from(edges)
 
 
-    def get_index_by_cardinal_direction(self, key):
-        dict_key = get_key_by_value(self.corner_node_dict, key, object=True)
-        return self.corner_node_dict[dict_key].index
-    
     def remove_south_north_connection(self):
-        e1 = self.get_index_by_cardinal_direction(CardinalDirections.SOUTH)
-        e2 = self.get_index_by_cardinal_direction(CardinalDirections.NORTH)
-        self.G.remove_edge(e1, e2)
+        n1 = self.local_get_index_by_cardinal_direction(CardinalDirections.SOUTH)
+        n2 = self.local_get_index_by_cardinal_direction(CardinalDirections.NORTH)
+        self.G.remove_edge(n1, n2)
 
     def add_south_north_connection(self):
-        e1 = self.get_index_by_cardinal_direction(CardinalDirections.SOUTH)
-        e2 = self.get_index_by_cardinal_direction(CardinalDirections.NORTH)
-        self.G.add_edge(e1, e2)
+        n1 = self.local_get_index_by_cardinal_direction(CardinalDirections.SOUTH)
+        n2 = self.local_get_index_by_cardinal_direction(CardinalDirections.NORTH)
+        self.G.add_edge(n1, n2)
 
-
+    def local_get_index_by_cardinal_direction(self, key):
+        return get_index_by_cardinal_direction(key, self.corner_node_dict)
+            
 
 
 

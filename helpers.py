@@ -9,12 +9,16 @@ import math
 import copy
 
 
+
 from icecream import ic
 import numpy as np
 
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 
+def get_index_by_cardinal_direction(key, corner_node_dict):
+    dict_key = get_key_by_value(corner_node_dict, key, object=True)
+    return corner_node_dict[dict_key].index
 
 # self- knowlegde
 def get_calling_function_name():
