@@ -4,6 +4,7 @@ def check_graph(G):
     check_triangulated_interior(G)
     alt_embed = check_planarity(G)
     check_seperating_triangle(G)
+    return alt_embed
 
 def check_planarity(G):
     planar_check, alt_embed = nx.check_planarity(G)
@@ -28,6 +29,12 @@ def check_triangulated_interior(G):
         if not check_shared_neighbour(G, e):
             raise Exception("Interior is not triangulated")
     return 
+
+def check_triangulated_chordal(G):
+    assert nx.is_chordal(G), "graph is not chordal"
+
+def check_4_conencted(G):
+    assert nx.is_k_edge_connected(G, 4), "not 4 connected"
 
 
 

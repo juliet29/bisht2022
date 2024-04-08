@@ -1,5 +1,3 @@
-import networkx as nx
-from icecream import ic
 from helpers import *
 from augment import *
 
@@ -20,42 +18,6 @@ class CanonicalOrder:
         self.find_next_node_and_update()
 
 
-    # helpers...
-    def get_node_index(self, key):
-        dict_key = get_key_by_value(self.corner_node_dict, key, object=True)
-        return self.corner_node_dict[dict_key].index
-
-    def create_next_graphs(self):
-        self.G_k_minus = nx.subgraph(self.G, self.subgraph_nodes)
-        self.G_diff = nx.subgraph(
-            self.G, set(self.G.nodes).difference(set(self.G_k_minus.nodes))
-        )
-        if self.order:
-            self.diff_graph_state[self.order] = self.G_diff
-            # TODO: keep track of G_k_minus at different states. 
-
-        return self.G_k_minus, self.G_diff
-
-    def test_biconnect(self):
-        a = Augment(self.G_k_minus)
-        a.G_biconnect = self.G_k_minus
-        a.test_biconnect()
-
-
-    # # action starts
-    # def connect_outer_edges(self):
-    #     # TODO move to own four connect class?
-    #     ix = self.get_node_index  # create alias
-    #     edges = [
-    #         (ix("south"), ix("east")),
-    #         (ix("east"), ix("north")),
-    #         (ix("north"), ix("west")),
-    #         (ix("west"), ix("south")),
-    #         (ix("south"), ix("north")),
-    #     ]
-    #     self.G.add_edges_from(edges)
-
-
     def initialize_order(self):
         self.subgraph_nodes = []
 
@@ -65,8 +27,10 @@ class CanonicalOrder:
             [self.get_node_index("south"), self.get_node_index("west")]
         )
 
-        # define the subgraph
         self.G_k_minus, self.G_diff = self.create_next_graphs()
+
+        # create tracker of embedding history ..
+        self.tracker = ListHistoryTracker(self.subgraph_nodes)
 
 
 
@@ -83,31 +47,65 @@ class CanonicalOrder:
             self.candidate_nodes_in_G_diff = list(
                 set(candidate_nodes).intersection(set(self.G_diff.nodes))
             )
-            # ic((v1, v2), candidate_nodes, self.candidate_nodes_in_G_diff)
+            ic((v1, v2), candidate_nodes, self.candidate_nodes_in_G_diff)
 
             # # check part 3 of refined canonical self.order theorem -> candidate node has two nbs in self.G_diff
             for node in self.candidate_nodes_in_G_diff:
-                true_candidate_nodes = []  # TODO rename
+                candidates_w_2_nbs_in_G_diff = []  # TODO rename
 
                 neighbours = {n for n in self.G.neighbors(node)}
 
                 if len(set(self.G_diff.nodes).intersection(neighbours)) >= 2:
-                    true_candidate_nodes.append(node)
+                    candidates_w_2_nbs_in_G_diff.append(node)
                 elif len(self.G_diff.nodes) <= 2:
-                    true_candidate_nodes.append(node)
+                    candidates_w_2_nbs_in_G_diff.append(node)
+                ic(candidates_w_2_nbs_in_G_diff)
+                
 
                 assert (
-                    len(true_candidate_nodes) == 1
+                    len(candidates_w_2_nbs_in_G_diff) == 1
                 ), "candidate nodes are invalid!"  # TODO issue arirses bc have sepersting triangles, ## check this.. thought that it was if it was three.. 
 
-            next_node = true_candidate_nodes[0]
-            # ic((true_candidate_nodes, next_node))
-            # ic(self.subgraph_nodes)
+            next_node = candidates_w_2_nbs_in_G_diff[0]
+            
 
             self.G.nodes[next_node]["canonical_order"] = self.order
             self.subgraph_nodes.append(next_node)
+            self.tracker.append(next_node)
 
             self.G_k_minus, self.G_diff = self.create_next_graphs()
 
             self.test_biconnect()
 
+            ic(next_node)
+            ic((self.subgraph_nodes, "\n"))
+
+
+    def create_next_graphs(self):
+        self.G_k_minus = nx.subgraph(self.G, self.subgraph_nodes)
+        self.G_diff = nx.subgraph(
+            self.G, set(self.G.nodes).difference(set(self.G_k_minus.nodes))
+        )
+        if self.order: # 
+            self.diff_graph_state[self.order] = copy.deepcopy(self.G_diff)
+    
+        return self.G_k_minus, self.G_diff
+    
+    #MARK: helpers
+    def get_history(self):
+        history = self.tracker.get_history()
+        # history[2:]
+
+        embed_seq = []
+        for state in history[2:]:
+            filtered_dict = {key: self.embed[key] for key in state if key in self.embed}
+            embed_seq.append(filtered_dict)
+
+    def test_biconnect(self):
+        a = Augment(self.G_k_minus)
+        a.G_biconnect = self.G_k_minus
+        a.test_biconnect()
+
+    def get_node_index(self, key):
+        dict_key = get_key_by_value(self.corner_node_dict, key, object=True)
+        return self.corner_node_dict[dict_key].index

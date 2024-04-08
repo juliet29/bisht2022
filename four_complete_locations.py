@@ -34,22 +34,20 @@ class FourCompleteLocations:
                 )
             )
 
-    # def assign_cardinal_directions(self):
-    #     coords = [i.location for i in self.corner_node_list]
-    #     directions = assign_directions(coords)
-    #     for k, v in directions.items():
-    #         ix = coords.index(v)
-    #         self.corner_node_list[ix].name = k
-
     def assign_cardinal_directions(self):
         coords = [c.location for c in self.corner_node_list]
         cw = clockwise_order(coords)
         order = [coords.index(i) for i in cw]
-        cardinal_directions = ["north", "east", "south", "west", ]
-        for o, car in zip(order, cardinal_directions):
+        cardinal_directions = [
+            "north",
+            "east",
+            "south",
+            "west",
+        ]
+        for o, direction in zip(order, cardinal_directions):
             ix = self.corner_node_list[o].index
-            ic(o, car, ix)
-            self.corner_node_list[o].name = car
+            ic(o, direction, ix)
+            self.corner_node_list[o].name = direction
 
     def embed_corner_nodes(self):
         for v in self.corner_node_list:
@@ -61,6 +59,7 @@ class FourCompleteLocations:
 
             # update the embedding
             self.embed[v.index] = np.array(v.location)
+        self.G_unconnected_corner_nodes = copy.deepcopy(self.G)
 
     def connect_outer_nodes(self):
         self.corner_node_dict = {
@@ -68,26 +67,36 @@ class FourCompleteLocations:
         }
         self.data.corner_node_dict = self.corner_node_dict
         # TODO move to own four connect class?
-        ix = self.get_node_index  # create alias
+        ix = self.get_index_by_cardinal_direction  # create alias
         edges = [
             (ix("south"), ix("east")),
             (ix("east"), ix("north")),
             (ix("north"), ix("west")),
             (ix("west"), ix("south")),
-            # (ix("south"), ix("north")),
+            (ix("south"), ix("north")),
         ]
         self.G.add_edges_from(edges)
 
-    def get_node_index(self, key):
+
+    def get_index_by_cardinal_direction(self, key):
         dict_key = get_key_by_value(self.corner_node_dict, key, object=True)
         return self.corner_node_dict[dict_key].index
     
+    def remove_south_north_connection(self):
+        e1 = self.get_index_by_cardinal_direction("south")
+        e2 = self.get_index_by_cardinal_direction("north")
+        self.G.remove_edge(e1, e2)
+
+    def add_south_north_connection(self):
+        e1 = self.get_index_by_cardinal_direction("south")
+        e2 = self.get_index_by_cardinal_direction("north")
+        self.G.add_edge(e1, e2)
 
 
-    
 
 
 
+#MARK: helpers
 def clockwise_order(coordinates):
     # Calculate the centroid of the coordinates
     centroid_x = sum(x for x, y in coordinates) / len(coordinates)
@@ -95,7 +104,9 @@ def clockwise_order(coordinates):
     centroid = Point(centroid_x, centroid_y)
 
     # Calculate the angle between each coordinate and the centroid
-    angles = [(math.atan2(y - centroid.y, x - centroid.x), x, y) for x, y in coordinates]
+    angles = [
+        (math.atan2(y - centroid.y, x - centroid.x), x, y) for x, y in coordinates
+    ]
 
     # Sort the coordinates based on the angles
     sorted_coordinates = sorted(angles)

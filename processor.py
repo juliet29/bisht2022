@@ -5,8 +5,7 @@ from boundaries import *
 from canonical_order import *
 from rel import *
 
-from collections import OrderedDict
-import copy
+
 
 
 class Processor:
