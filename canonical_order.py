@@ -21,10 +21,10 @@ class CanonicalOrder:
     def initialize_order(self):
         self.subgraph_nodes = []
 
-        self.G.nodes[self.get_node_index("south")]["canonical_order"] = 1
-        self.G.nodes[self.get_node_index("west")]["canonical_order"] = 2
+        self.G.nodes[self.get_node_by_cardinal_direction("south")]["canonical_order"] = 1
+        self.G.nodes[self.get_node_by_cardinal_direction("west")]["canonical_order"] = 2
         self.subgraph_nodes.extend(
-            [self.get_node_index("south"), self.get_node_index("west")]
+            [self.get_node_by_cardinal_direction("south"), self.get_node_by_cardinal_direction("west")]
         )
 
         self.G_k_minus, self.G_diff = self.create_next_graphs()
@@ -106,6 +106,6 @@ class CanonicalOrder:
         a.G_biconnect = self.G_k_minus
         a.test_biconnect()
 
-    def get_node_index(self, key):
+    def get_node_by_cardinal_direction(self, key):
         dict_key = get_key_by_value(self.corner_node_dict, key, object=True)
         return self.corner_node_dict[dict_key].index

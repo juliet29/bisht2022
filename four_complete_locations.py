@@ -38,13 +38,13 @@ class FourCompleteLocations:
         coords = [c.location for c in self.corner_node_list]
         cw = clockwise_order(coords)
         order = [coords.index(i) for i in cw]
-        cardinal_directions = [
-            "north",
-            "east",
-            "south",
-            "west",
-        ]
-        for o, direction in zip(order, cardinal_directions):
+        # cardinal_directions = [
+        #     CardinalDirections.NORTH,
+        #     CardinalDirections.EAST,
+        #     CardinalDirections.SOUTH,
+        #     CardinalDirections.WEST,
+        # ]
+        for o, direction in zip(order, CardinalDirections):
             ix = self.corner_node_list[o].index
             ic(o, direction, ix)
             self.corner_node_list[o].name = direction
@@ -69,11 +69,11 @@ class FourCompleteLocations:
         # TODO move to own four connect class?
         ix = self.get_index_by_cardinal_direction  # create alias
         edges = [
-            (ix("south"), ix("east")),
-            (ix("east"), ix("north")),
-            (ix("north"), ix("west")),
-            (ix("west"), ix("south")),
-            (ix("south"), ix("north")),
+            (ix(CardinalDirections.SOUTH), ix(CardinalDirections.EAST)),
+            (ix(CardinalDirections.EAST), ix(CardinalDirections.NORTH)),
+            (ix(CardinalDirections.NORTH), ix(CardinalDirections.WEST)),
+            (ix(CardinalDirections.WEST), ix(CardinalDirections.SOUTH)),
+            (ix(CardinalDirections.SOUTH), ix(CardinalDirections.NORTH)),
         ]
         self.G.add_edges_from(edges)
 
@@ -83,13 +83,13 @@ class FourCompleteLocations:
         return self.corner_node_dict[dict_key].index
     
     def remove_south_north_connection(self):
-        e1 = self.get_index_by_cardinal_direction("south")
-        e2 = self.get_index_by_cardinal_direction("north")
+        e1 = self.get_index_by_cardinal_direction(CardinalDirections.SOUTH)
+        e2 = self.get_index_by_cardinal_direction(CardinalDirections.NORTH)
         self.G.remove_edge(e1, e2)
 
     def add_south_north_connection(self):
-        e1 = self.get_index_by_cardinal_direction("south")
-        e2 = self.get_index_by_cardinal_direction("north")
+        e1 = self.get_index_by_cardinal_direction(CardinalDirections.SOUTH)
+        e2 = self.get_index_by_cardinal_direction(CardinalDirections.NORTH)
         self.G.add_edge(e1, e2)
 
 

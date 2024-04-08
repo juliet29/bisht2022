@@ -1,7 +1,14 @@
 import networkx as nx
+from enum import Enum
 
 
-# simple classes
+class CardinalDirections(Enum):
+    SOUTH = 0
+    WEST = 1
+    NORTH = 2
+    EAST = 3
+
+
 class SeperatingTriangleData:
     def __init__(self, cycle: list, inner_node: int) -> None:
         self.cycle = cycle
