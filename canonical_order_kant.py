@@ -4,6 +4,7 @@ from augment import *
 from helpers_classes import *
 
 from four_complete_locations import *
+from canonical_order_node import *
 
 
 class KantCanonicalOrder:
@@ -16,14 +17,28 @@ class KantCanonicalOrder:
 
 
     def initialize_order(self):
-        for number in list(range(3)):
+        self.initialize_all_nodes()
+        self.update_starting_nodes()
+        self.update_vn()
+
+    def initialize_all_nodes(self):
+        for node_index in self.G.nodes:
+            self.G.nodes[node_index]["data"] = NodeCanonicalOrder(index=node_index, order=-99)
+
+        
+
+    def update_starting_nodes(self):
+        # u = v1 ⇒ v_south , u=v2 ⇒ v_west, w = v_n ⇒ v_north 
+        # (following kindermann)
+        for number in list(range(2)):
             node_index = get_index_by_cardinal_direction(CardinalDirections(number), self.corner_node_dict) # TODO -> put this in a different class..
 
-            if number < 2:
-                order = number + 1
-            else:
-                order = len(self.G.nodes)
+            self.G.nodes[node_index]["data"] = NodeCanonicalOrder(index=node_index, order=number+1)
 
-            self.G.nodes[node_index]["canonical_order_data"] = NodeCanonicalOrder(index=node_index, order=order)
+
+    def update_vn(self):
+        # NOTE: canonical order is indexed 1,2,... while nodes are indexed 0,1,2, ... 
+        self.vn = len(self.G.nodes)
+        self.G.nodes[(self.vn-1)]["data"].visited = 2
 
     

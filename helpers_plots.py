@@ -6,16 +6,8 @@ from plotly.subplots import make_subplots
 import plotly.express as px
 from pprint import pprint
 
-def show_graph_attributes(G:nx.Graph):
-    for node, data in G.nodes.data():
-        pprint(f"Node {node}: {data}")
 
 
-
-def points_to_plot(coords):
-    x = [c[0] for c in coords]
-    y  = [c[1] for c in coords]
-    return x, y
 
 def plot_planar_embed(embed: nx.PlanarEmbedding):
     pos = nx.combinatorial_embedding_to_pos(embed)

@@ -16,6 +16,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 
+
+def show_graph_attributes(G:nx.Graph):
+    for node, data in G.nodes.data():
+        pprint(f"Node {node}: {data}")
+
+
+def points_to_plot(coords):
+    x = [c[0] for c in coords]
+    y  = [c[1] for c in coords]
+    return x, y
+
+
 def get_index_by_cardinal_direction(key, corner_node_dict):
     dict_key = get_key_by_value(corner_node_dict, key, object=True)
     return corner_node_dict[dict_key].index
