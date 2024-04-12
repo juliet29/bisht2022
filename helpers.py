@@ -15,6 +15,27 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
+import shapely as sp
+
+
+def vector_between_points(pt1:sp.Point, pt2:sp.Point):
+    x, y = (pt1.x - pt2.x, pt1.y - pt2.y)
+    magnitude = math.sqrt(x**2 + y**2)
+    return (x/magnitude, y/magnitude)
+
+
+def angle_between_vectors(v, w):
+    dot_product = np.dot(v, w)
+    v_magnitude = np.linalg.norm(v)
+    w_magnitude = np.linalg.norm(w)
+    cos_theta = dot_product / (v_magnitude * w_magnitude)
+    angle_radians = np.arccos(np.clip(cos_theta, -1.0, 1.0))
+    angle_degrees = np.degrees(angle_radians)
+    return angle_degrees, angle_radians
+
+
+def get_emedding_coords(embed, arr):
+        return [embed[i] for i in arr]
 
 
 def show_graph_attributes(G:nx.Graph):

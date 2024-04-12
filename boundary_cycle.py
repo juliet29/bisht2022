@@ -12,6 +12,7 @@ class BoundaryCycle:
     def __init__(self, GraphData: GraphData) -> None:
         self.G = GraphData.G
         self.embed = GraphData.embed
+        self.boundary_line_string = None
 
         self.run()
 
@@ -22,19 +23,16 @@ class BoundaryCycle:
             self.get_graph_boundary_cycle()
             self.get_ccw_cycle()
         except Exception as e: 
-            traceback.print_exc()
+            ic("issue when running b cycle")
+            traceback.print_exc(e)
 
-        #exception handling code
-
-    def get_emedding_coords(self, embed, arr):
-        return [embed[i] for i in arr]
 
     def generate_geometry_from_graph(self):
         self.inner_faces = {}
         for ix, c in enumerate(nx.simple_cycles(G=self.G, length_bound=3)):
             self.inner_faces[ix] = {
                 "cycle": c,
-                "shape": sp.LinearRing(self.get_emedding_coords(self.embed, c)),
+                "shape": sp.LinearRing(get_emedding_coords(self.embed, c)),
             }
 
     def get_geometry_boundary(self):
@@ -42,6 +40,7 @@ class BoundaryCycle:
             [sp.Polygon(i["shape"]) for i in self.inner_faces.values()]
         )
         self.boundary_line_string = sp.unary_union(complete_faces).boundary
+        
 
     def get_graph_boundary_cycle(self):
         coords = [i for i in self.boundary_line_string.coords]

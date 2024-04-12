@@ -28,6 +28,7 @@ class FourCompleteBuffer:
 
         self.buffer = self.boundary_shape.buffer(self.buffer_size)
 
+        # proj gives the distance along the boundary as a float 
         proj = self.buffer.boundary.project(self.pt)
         proj_point = self.buffer.boundary.line_interpolate_point(proj)
 

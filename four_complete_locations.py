@@ -38,12 +38,6 @@ class FourCompleteLocations:
         coords = [c.location for c in self.corner_node_list]
         cw = clockwise_order(coords)
         order = [coords.index(i) for i in cw]
-        # cardinal_directions = [
-        #     CardinalDirections.NORTH,
-        #     CardinalDirections.EAST,
-        #     CardinalDirections.SOUTH,
-        #     CardinalDirections.WEST,
-        # ]
         for o, direction in zip(order, CardinalDirections):
             ix = self.corner_node_list[o].index
             ic(o, direction, ix)
