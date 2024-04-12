@@ -21,7 +21,8 @@ import shapely as sp
 def vector_between_points(pt1:sp.Point, pt2:sp.Point):
     x, y = (pt1.x - pt2.x, pt1.y - pt2.y)
     magnitude = math.sqrt(x**2 + y**2)
-    return (x/magnitude, y/magnitude)
+    # return (x/magnitude, y/magnitude)
+    return (x,y)
 
 
 def angle_between_vectors(v, w):

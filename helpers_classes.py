@@ -1,6 +1,14 @@
 import networkx as nx
 from enum import Enum
 
+class PointsList:
+    def __init__(self, pair:tuple):
+        self.x = pair[0]
+        self.y = pair[1]
+    
+    def __repr__(self):
+        return f"PointsList({self.__dict__})"
+
 
 class CardinalDirections(Enum):
     SOUTH = 0
