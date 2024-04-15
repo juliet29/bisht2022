@@ -2,7 +2,7 @@ from helpers import *
 from boundary_cycle import BoundaryCycle
 from matplotlib.patches import FancyArrowPatch, ConnectionStyle
 
-class FourCompleteEdges:
+class FourCompleteEdgesArchive:
     def __init__(self, GraphData: GraphData, pre_four_complete_shape:sp.LineString, buffer_size:float = 0.5) -> None:
         self.data = GraphData
         self.G = GraphData.G
