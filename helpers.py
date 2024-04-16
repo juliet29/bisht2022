@@ -18,6 +18,18 @@ import plotly.graph_objects as go
 import shapely as sp
 
 
+def quick_plotly_plot(x,y, label="None"):
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=x, y=y, mode='markers', name=label))
+    return fig
+
+def add_geom_to_plotly(geom, fig, label="None", mode="markers"):
+    x, y = points_to_plot(geom.coords)
+    fig.add_trace(go.Scatter(x=x, y=y, mode=mode, name=label))
+    return fig
+     
+
+
 def vector_between_points(pt1:sp.Point, pt2:sp.Point):
     x, y = (pt1.x - pt2.x, pt1.y - pt2.y)
     magnitude = math.sqrt(x**2 + y**2)
