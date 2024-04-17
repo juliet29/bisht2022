@@ -15,6 +15,12 @@ class CrossingMin:
 
     def run(self):
         self.find_crossing_edges()
+
+         # TODO will need to loop through.. 
+        self.curr_line = self.crossing_lines[self.index]
+        self.find_extrema_near_crossinge_edge()
+        self.create_guiding_circle()
+        self.create_new_boundary()
         
 
         
@@ -32,98 +38,96 @@ class CrossingMin:
 
 
     def find_extrema_near_crossinge_edge(self):
-        extrema = [sp.Point(c) for c in self.pre_four_complete_shape.convex_hull.boundary.coords] # TODO move to own fx
-        curr_line = self.crossing_lines[self.index]
+        extrema = [sp.Point(c) for c in self.pre_four_complete_shape.convex_hull.boundary.coords] #
+
+        
 
         # TODO could make this simpler with argmin 
         min_distance = 1000
-        self.closest_point  = sp.Point()
+        self.guiding_circle_center  = sp.Point()
         for e in extrema:
-            if e.dwithin(curr_line.centroid, min_distance):
-                min_distance = e.distance(curr_line.centroid)
-                self.closest_point = e
+            if e.dwithin(self.curr_line.centroid, min_distance):
+                min_distance = e.distance(self.curr_line.centroid)
+                self.guiding_circle_center = e
+
+    def create_guiding_circle(self):
+        distances = [sp.Point(p).distance(self.guiding_circle_center) for p in self.curr_line.coords]
+        self.radius = min(distances)
+        self.guiding_circle = create_circle(self.guiding_circle_center.x, self.guiding_circle_center.y, self.radius)
+
+    def create_new_boundary(self):
+        _, _, rad0 = self.calculate_node_radians(0)
+        _, _, rad1 = self.calculate_node_radians(1)
+
+        self.new_boundary = create_circle(self.guiding_circle_center.x, self.guiding_circle_center.y, self.radius, theta_start=rad0, theta_end=rad1)
+
+
+
+    def calculate_node_radians(self, node_ix):
+        # each edge has two things.. 
+        pt = sp.get_geometry(self.curr_line.boundary, node_ix)
+        dist_along = self.guiding_circle.line_locate_point(pt)
+        pt_on_circle = self.guiding_circle.line_interpolate_point(dist_along) # TODO this is a behavior that is repeated with buffer, so should make a function .. 
+
+        x, y = self.adjust_point_relative_to_origin(pt_on_circle)
+
+        radians = math.atan((y/x))
+        ic(radians)
+        ic(math.degrees(radians))
+
+        # Ensure the angle is in [0, 2π]
+        if radians < 0:
+                radians += 2 * math.pi  
+
+        ic(math.degrees(radians))
+
+        return pt, pt_on_circle, radians
+    
+
+
+    def adjust_point_relative_to_origin(self, point):
+        x1,y1 = self.move_guiding_circle_to_origin()
+        ls = sp.LineString((self.guiding_circle_center, point))
+        ls2 = sp.transform(ls, lambda x: x + [x1, y1] )
+        new_pt = None
+        for c in ls2.coords:
+            if c[0] != 0 and c[1] != 0:
+                new_pt = c
+
+        assert new_pt
+        d1 = euclidean_distance(new_pt, (0,0))
+        d2 = euclidean_distance((self.guiding_circle_center.x, self.guiding_circle_center.y), (point.x, point.y))
+
+        assert d1 == d2
+
+        return new_pt
+    
+
+    def move_guiding_circle_to_origin(self):
+        x = self.guiding_circle_center.x * -1
+        y =  self.guiding_circle_center.y * -1
+        return x, y
+
                 
-          
-
-
-
-
-
-
-    # def create_temp_boundary_shape(self):
-    #     ## remove edges and create a new shape 
-    #     temp_G = copy.deepcopy(self.G)
-    #     temp_G.remove_edges_from(self.crossing_edges)
-    #     g = GraphData(temp_G, self.embed)
-    #     self.temp_boundary_shape = sp.Polygon(BoundaryCycle(g).boundary_line_string)
-
-    
-    # def create_curved_edge(self, index):
-    #     edge = self.crossing_edges[index]
-    #     line = self.crossing_lines[index]
-    #     ic(edge)
-
-    #     self.proj_point = self.project_crossing_edge_onto_buffer(line)
-
-    #     node1, node2 = (sp.Point(t)  for t in get_emedding_coords(self.embed, edge))
-    #     self.vec1 = vector_between_points(node1, self.proj_point)
-    #     self.vec2 = vector_between_points(node2, self.proj_point)
-    #     _, rad = angle_between_vectors(self.vec1, self.vec2)
-    #     ic(rad)
-
-    #     self.curve = FancyArrowPatch((node1.x, node1.y), (node2.x, node2.y), arrowstyle='fancy', mutation_scale=5, connectionstyle=f"arc3,rad={rad}")
-
-    # def create_curved_edge2(self, index):
-    #     edge = self.crossing_edges[index]
-    #     line = self.crossing_lines[index]
-    #     ic(edge)
-
-    #     self.proj_point = self.project_crossing_edge_onto_buffer(line)
-
-    #     node1, node2 = (sp.Point(t)  for t in get_emedding_coords(self.embed, edge))
-    #     self.vec1 = vector_between_points(node1, self.proj_point)
-    #     self.vec2 = vector_between_points(node2, self.proj_point)
-    #     _, rad = angle_between_vectors(self.vec1, self.vec2)
-    #     ic(rad)
-
-    #     self.curve = FancyArrowPatch((node1.x, node1.y), (node2.x, node2.y), arrowstyle='fancy', mutation_scale=5, connectionstyle=f"arc3,rad={rad}")
-
-    
-
-        
-
-    # def project_crossing_edge_onto_buffer(self, line):
-    #     self.temp_buffer = self.temp_boundary_shape.buffer(0.5)
-
-    #     proj = self.temp_buffer.boundary.project(line.centroid)
-    #     proj_point = self.temp_buffer.boundary.line_interpolate_point(proj)
-
-    #     return proj_point
-    
-
-    
-    # def prepare_to_plot(self):
-
-    #     buffer = PointsList(points_to_plot(self.temp_buffer.boundary.coords))
-    #     vec1 =  self.join_vector(self.vec1)
-    #     vec2 = self.join_vector(self.vec2)
-
-    #     self.plotting_data = {"buffer": buffer, "vec1": vec1, "vec2": vec2}
-
-    # def join_vector(self, vector):
-    #     x=[self.proj_point.x, vector[0]+self.proj_point.x]
-    #     y=[self.proj_point.y, vector[1]+self.proj_point.y]
-    #     return PointsList((x,y))
         
 
 
 
+def create_circle(h, k, r, num_points=10, theta_start=0.0, theta_end=2*math.pi):
+    # TODO => can put (h,k,r) into own class.. 
 
+    # Generate values for theta within the specified range
+    theta = np.linspace(theta_start, theta_end, num_points)
 
+    # Calculate corresponding x and y values using parametric equations
+    x_coords = h + r * np.cos(theta)
+    y_coords = k + r * np.sin(theta)
+
+    coords = [(x,y) for x,y in zip(x_coords, y_coords) ]
+    circle = sp.LinearRing(coords)
+
+    return circle
     
-
-
-
 
 
 
