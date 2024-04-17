@@ -17,16 +17,16 @@ class CrossingMin:
         self.find_crossing_edges()
 
          # TODO will need to loop through.. 
-        self.curr_line = self.crossing_lines[self.index]
-        self.find_extrema_near_crossinge_edge()
-        self.create_guiding_circle()
-        self.create_new_boundary()
         
-
+        for i in range(len(self.crossing_edges)):
+            self.find_extrema_near_crossinge_edge()
+            self.create_guiding_circle()
+            self.create_new_boundary()
+            self.update_graph_edge()
+            self.index+=1
         
 
     def find_crossing_edges(self):
-        #TODO maybe make an object or dictionary? 
         self.crossing_edges = [] 
         self.crossing_lines = []
         for e in list(self.G.edges):
@@ -40,7 +40,7 @@ class CrossingMin:
     def find_extrema_near_crossinge_edge(self):
         extrema = [sp.Point(c) for c in self.pre_four_complete_shape.convex_hull.boundary.coords] #
 
-        
+        self.curr_line = self.crossing_lines[self.index]
 
         # TODO could make this simpler with argmin 
         min_distance = 1000
@@ -50,6 +50,7 @@ class CrossingMin:
                 min_distance = e.distance(self.curr_line.centroid)
                 self.guiding_circle_center = e
 
+
     def create_guiding_circle(self):
         distances = [sp.Point(p).distance(self.guiding_circle_center) for p in self.curr_line.coords]
         self.radius = min(distances)
@@ -58,9 +59,13 @@ class CrossingMin:
     def create_new_boundary(self):
         _, _, rad0 = self.calculate_node_radians(0)
         _, _, rad1 = self.calculate_node_radians(1)
+        ic(self.guiding_circle_center)
 
-        self.new_boundary = create_circle(self.guiding_circle_center.x, self.guiding_circle_center.y, self.radius, theta_start=rad0, theta_end=rad1)
+        self.new_boundary = create_circle(self.guiding_circle_center.x, self.guiding_circle_center.y, self.radius, theta_start=rad0, theta_end=rad1, closed=False)
 
+    def update_graph_edge(self):
+        curr_edge = self.crossing_edges[self.index]
+        self.G.edges[curr_edge]["curved_edge_data"] = self.new_boundary
 
 
     def calculate_node_radians(self, node_ix):
@@ -72,8 +77,8 @@ class CrossingMin:
         x, y = self.adjust_point_relative_to_origin(pt_on_circle)
 
         radians = math.atan((y/x))
-        ic(radians)
-        ic(math.degrees(radians))
+        # ic(radians)
+        # ic(math.degrees(radians))
 
         # Ensure the angle is in [0, 2π]
         if radians < 0:
@@ -109,11 +114,8 @@ class CrossingMin:
         return x, y
 
                 
-        
 
-
-
-def create_circle(h, k, r, num_points=10, theta_start=0.0, theta_end=2*math.pi):
+def create_circle(h, k, r, num_points=10, theta_start=0.0, theta_end=2*math.pi, closed=True):
     # TODO => can put (h,k,r) into own class.. 
 
     # Generate values for theta within the specified range
@@ -124,7 +126,11 @@ def create_circle(h, k, r, num_points=10, theta_start=0.0, theta_end=2*math.pi):
     y_coords = k + r * np.sin(theta)
 
     coords = [(x,y) for x,y in zip(x_coords, y_coords) ]
-    circle = sp.LinearRing(coords)
+
+    if closed:
+        circle = sp.LinearRing(coords)
+    else:
+        circle = sp.LineString(coords)
 
     return circle
     
