@@ -38,9 +38,9 @@ class CrossingMin:
 
 
     def find_extrema_near_crossinge_edge(self):
-        extrema = [sp.Point(c) for c in self.pre_four_complete_shape.convex_hull.boundary.coords] #
-
         self.curr_line = self.crossing_lines[self.index]
+
+        extrema = [sp.Point(c) for c in self.pre_four_complete_shape.convex_hull.boundary.coords] #
 
         # TODO could make this simpler with argmin 
         min_distance = 1000
@@ -68,11 +68,15 @@ class CrossingMin:
         self.G.edges[curr_edge]["curved_edge_data"] = self.new_boundary
 
 
-    def calculate_node_radians(self, node_ix):
+    def calculate_node_radians(self, edge_node_ix):
         # each edge has two things.. 
-        pt = sp.get_geometry(self.curr_line.boundary, node_ix)
+        pt = sp.get_geometry(self.curr_line.boundary, edge_node_ix)
         dist_along = self.guiding_circle.line_locate_point(pt)
         pt_on_circle = self.guiding_circle.line_interpolate_point(dist_along) # TODO this is a behavior that is repeated with buffer, so should make a function .. 
+
+        # adjust poistion in graph embedding 
+        curr_node = self.crossing_edges[self.index][edge_node_ix]
+        self.embed[curr_node] = np.array((pt_on_circle.x, pt_on_circle.y))
 
         x, y = self.adjust_point_relative_to_origin(pt_on_circle)
 
