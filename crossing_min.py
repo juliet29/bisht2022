@@ -1,5 +1,6 @@
 from helpers import *
 from boundary_cycle import BoundaryCycle
+from simplify_by_angle import *
 # from matplotlib.patches import FancyArrowPatch, ConnectionStyle
 
 class CrossingMin:
@@ -37,23 +38,39 @@ class CrossingMin:
                 self.crossing_lines.append(line)
 
 
+
+
     def find_extrema_near_crossinge_edge(self):
         self.curr_line = self.crossing_lines[self.index]
+        self.curr_edge = self.crossing_edges[self.index]
 
-        extrema = [sp.Point(c) for c in self.pre_four_complete_shape.convex_hull.boundary.coords] #
+        self.find_extrema()
 
-        # TODO could make this simpler with argmin 
         min_distance = 1000
         self.guiding_circle_center  = sp.Point()
-        for e in extrema:
+        for ix, e in enumerate(self.extrema):
+            try:
+                self.check_far_from_edge_vertices(e)
+            except AssertionError:
+                    ic(f" extrema {ix} is too close to edge's vertex")
+                    continue
             if e.dwithin(self.curr_line.centroid, min_distance):
-                min_distance = e.distance(self.curr_line.centroid)
-                self.guiding_circle_center = e
+                    self.guiding_circle_center = e
+                    min_distance = e.distance(self.curr_line.centroid)
+
+    def find_extrema(self):
+        simplified_shape = simplify_by_angle(sp.Polygon(self.pre_four_complete_shape)).boundary.coords[0:-1]
+        self.extrema= [sp.Point(c) for c in simplified_shape]
+        
+
+    def check_far_from_edge_vertices(self, extrema):
+        for vertex in self.curr_edge:
+            assert np.isclose((extrema.x, extrema.y), self.embed[vertex]).all() == False
 
 
     def create_guiding_circle(self):
         distances = [sp.Point(p).distance(self.guiding_circle_center) for p in self.curr_line.coords]
-        self.radius = min(distances)
+        self.radius = max(distances) 
         self.guiding_circle = create_circle(self.guiding_circle_center.x, self.guiding_circle_center.y, self.radius)
 
     def create_new_boundary(self):
@@ -118,6 +135,9 @@ class CrossingMin:
         return x, y
 
                 
+
+
+
 
 def create_circle(h, k, r, num_points=10, theta_start=0.0, theta_end=2*math.pi, closed=True):
     # TODO => can put (h,k,r) into own class.. 

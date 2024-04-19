@@ -18,16 +18,35 @@ import plotly.graph_objects as go
 import shapely as sp
 
 
-def quick_plotly_plot(x,y, label="None"):
+def quick_plotly_plot(x,y, label="None", mode="markers"):
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x, y=y, mode='markers', name=label))
+    fig.add_trace(go.Scatter(x=x, y=y, name=label, mode=mode, ))
     return fig
 
 def add_geom_to_plotly(geom, fig, label="None", mode="markers"):
     x, y = points_to_plot(geom.coords)
-    fig.add_trace(go.Scatter(x=x, y=y, mode=mode, name=label))
+    fig.add_trace(go.Scatter(x=x, y=y, name=label,  mode=mode, ))
     return fig
      
+def add_embedding_to_plotly(embed, fig=None):
+    if not fig:
+        fig = go.Figure()
+
+    x = [v[0] for v in embed.values()]
+    y = [v[1] for v in embed.values()]
+    keys = [k for k in embed.keys()]
+
+    for ix, k in enumerate(keys):
+        fig.add_trace(go.Scatter(
+            x=[x[ix]], 
+            y=[y[ix]], 
+            name=k, mode="markers", 
+            hovertext=[f"{k}, ({np.round(x[ix],3), np.round(y[ix],3)})"],
+            hoverinfo="text",     
+            marker=dict(color="blue", opacity=0.4, size=10)
+        ))
+
+    return fig
 
 
 def vector_between_points(pt1:sp.Point, pt2:sp.Point):
