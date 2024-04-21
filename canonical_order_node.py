@@ -1,10 +1,10 @@
 class NodeCanonicalOrder:
-    def __init__(self, index:int, order) -> None:
+    def __init__(self, index:int,) -> None:
         self.index = index # node index in the graph .. 
-        self.order = order
+        self.order = -99
 
         self.mark = False
-        self.visited = 0
+        self.visited = 1
         self.chords = 0
 
 

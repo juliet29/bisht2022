@@ -25,7 +25,7 @@ class KantCanonicalOrder:
 
     def initialize_all_nodes(self):
         for node_index in self.G.nodes:
-            self.G.nodes[node_index]["data"] = NodeCanonicalOrder(index=node_index, order=-99)
+            self.G.nodes[node_index]["data"] = NodeCanonicalOrder(index=node_index)
 
 
     def update_starting_nodes(self):
@@ -35,13 +35,13 @@ class KantCanonicalOrder:
             # (following kindermann)
             node_index = get_index_by_cardinal_direction(CardinalDirections(number), self.corner_node_dict) 
             
-            self.G.nodes[node_index]["data"] = NodeCanonicalOrder(index=node_index, order=number+1)
+            self.G.nodes[node_index]["data"].order= number + 1
         # ending node updates
         self.G.nodes[self.vn]["data"].visited = 2
 
 
-    # def update_vn(self):
-    #     self.vn-=1
+    def update_vn(self):
+        self.vn-=1
        
 
     #     # self.G.nodes[(self.vn-1)]["data"].visited = 2
