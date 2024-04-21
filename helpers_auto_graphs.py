@@ -1,10 +1,9 @@
-import networkx as nx
 import os 
 import pickle
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-import plotly.express as px
+
+import networkx as nx
 from pprint import pprint
+import numpy as np
 
 
 #MARK: getting graph info 
@@ -41,6 +40,19 @@ def plot_just_planar(G: nx.Graph, pos=None):
 
 
 #MARK: special starting graphs
+def simple_four_con_graph():
+    pos = [(-3,0), (0,4),(0,8), (3,4), (6,2), (3,0), (0,-4), (0,0) ]
+    outer_edges = [(0,1), (1,2), (2,3), (3,4), (4,5), (5,6), (6,7), (7,0)]
+    inner_edges = [(7,1), (1,3), (3,5), (5,7), (1,5)]
+    edges_connecting_outer = [(0,2), (2,4), (4,6), (6,0)]
+    
+    edges = outer_edges + inner_edges + edges_connecting_outer
+    G = nx.Graph()
+    G.add_edges_from(edges)
+    embed = {k:np.array(v) for (k,v) in enumerate(pos)}
+
+    return G, embed
+
 def get_saved_graph_data(type=None):
     path = "saved_graphs/after_sep_tri"
     
@@ -98,4 +110,5 @@ def square_tri_graph():
     G.add_edge(1, 5)  # Connect a node from the square to a node from the triangle
 
     return G
+
 
