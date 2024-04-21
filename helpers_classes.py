@@ -8,6 +8,9 @@ from pprint import pprint
 def get_emedding_coords(embed, arr):
         return [embed[i] for i in arr]
 
+def get_emedding_coords_as_tuple(embed, arr):
+        return [tuple(embed[i]) for i in arr]
+
 
 def show_graph_attributes(G:nx.Graph):
     for node, data in G.nodes.data():

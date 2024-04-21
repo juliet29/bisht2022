@@ -26,8 +26,8 @@ class NodeCanonicalOrder:
         self.visited +=1
 
 
-    def update_chords(self):
+    def update_chords(self, num_chords):
+        self.chords = num_chords
         # need to have the exterior face of subgraph induced by V- {u < V | Mark(u) == true}
         # need to see the chords within this graph 
         # need to see the number indicdent to this node 
-        pass
