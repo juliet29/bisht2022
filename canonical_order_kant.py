@@ -6,6 +6,8 @@ from helpers_classes import *
 from four_complete_locations import *
 from canonical_order_node import *
 
+from boundary_cycle import *
+
 
 class KantCanonicalOrder:
     def __init__(self, GraphData: GraphData) -> None:
@@ -21,7 +23,6 @@ class KantCanonicalOrder:
     def initialize_order(self):
         self.initialize_all_nodes()
         self.update_starting_nodes()
-        # self.update_vn()
 
     def initialize_all_nodes(self):
         for node_index in self.G.nodes:
@@ -31,20 +32,89 @@ class KantCanonicalOrder:
     def update_starting_nodes(self):
         # cardinal updates
         for number in list(range(2)):
-            # u = v1 ⇒ v_south , u=v2 ⇒ v_west, w = v_n ⇒ v_north 
-            # (following kindermann)
             node_index = get_index_by_cardinal_direction(CardinalDirections(number), self.corner_node_dict) 
-            
-            self.G.nodes[node_index]["data"].order= number + 1
-        # ending node updates
+            self.G.nodes[node_index]["data"].order = number + 1
+
+        # update last node
         self.G.nodes[self.vn]["data"].visited = 2
 
+    def finish_order(self):
+        for i in range(len(self.G.nodes)):
+            for node_index in self.G.nodes:
+                if self.check_vertex_criteria(node_index): #3.1
+                    ic(node_index)
+                    data = self.get_node_data(node_index)
+                    data.update_mark()
+                    
+                    ic(self.vn)
+                    data.add_node_to_order(self.vn)
+                    self.update_vn()
+                    if self.vn <=2:
+                        break
+
+                    self.update_neighbors(node_index)
+                    break
 
     def update_vn(self):
         self.vn-=1
+
+    def check_vertex_criteria(self, node_index):
+        data = self.get_node_data(node_index)
+        if data.mark == False:
+            if data.visited >= 2:
+                # ic(f"{node_index} has >= 2 visited")
+                if data.chords == 0:
+                    if data.order != 1 and data.order != 2:
+                        return True
+
+    def update_neighbors(self, node_index):
+        valid_nbs = [nb for nb in self.G.neighbors(self.vn) if self.get_node_data(nb).mark == False]
+        ic(valid_nbs)
+        for nb in valid_nbs: #3.2
+            data = self.get_node_data(nb)
+            data.update_visited()
+        
+        G_chord_analysis = self.get_chord_analysis_graph()
+        for node in valid_nbs + [node_index]: # 3.3
+            self.check_and_update_chords(G_chord_analysis, node)
+    
+    def get_chord_analysis_graph(self, ):
+        G_diff = self.get_unmarked_graph()
+        G_ext = self.get_exterior_graph(G_diff)
+        return G_ext
+    
+    def check_and_update_chords(self, G_chord_analysis, node_index):
+        if node_index in G_chord_analysis.nodes:
+            nbs = [nb for nb in G_chord_analysis.neighbors(node_index)]
+            if len(nbs) > 2:
+                num_chords = len(nbs) - 2
+                ic(f"updating chords for {node_index} to {num_chords}")
+                self.get_node_data(node_index).update_chords(num_chords)
+
+
+    def get_unmarked_graph(self, ):
+        marked_nodes = []
+        for node_index in self.G.nodes:
+            data = self.get_node_data(node_index)
+            if data.mark == True:
+                marked_nodes.append(node_index)
+
+        unmarked_nodes = set(self.G.nodes).difference(set(marked_nodes))
+        G_diff = nx.subgraph(self.G, unmarked_nodes)
+        return G_diff
+
+    def get_exterior_graph(self, G_diff):
+        temp_graph_data  = GraphData(G_diff, self.embed)
+        b = BoundaryCycle(temp_graph_data, CONVEX_APPROACH=True)
+        exterior_nodes = b.ccw_boundary_cycle
+        G_ext = nx.subgraph(self.G, exterior_nodes)        
+        return G_ext
        
 
-    #     # self.G.nodes[(self.vn-1)]["data"].visited = 2
-    #     # TODO should be counting down .. 
+    def get_node_data(self, node_index):
+        data:NodeCanonicalOrder = self.G.nodes[node_index]["data"]
+        return data
+    
+
 
     
