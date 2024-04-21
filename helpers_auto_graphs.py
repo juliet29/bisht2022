@@ -2,19 +2,10 @@ import os
 import pickle
 
 import networkx as nx
-from pprint import pprint
 import numpy as np
 
 
-#MARK: getting graph info 
-#TODO make augmented networkx classes.. 
-def get_emedding_coords(embed, arr):
-        return [embed[i] for i in arr]
 
-
-def show_graph_attributes(G:nx.Graph):
-    for node, data in G.nodes.data():
-        pprint(f"Node {node}: {data}")
 
 
 #MARK: plotting graphs 

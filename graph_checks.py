@@ -17,11 +17,10 @@ def check_seperating_triangle(G):
     m = len(list(G.edges))
     n = len(list(G.nodes))
 
-    ic(f"\n {len(l3_cycles)} three cycles ?= {m - n + 1}, where m={m}, n={n}")
     if len(l3_cycles) == m - n + 1:
         return 
     else:
-        raise Exception("There are seperating triangles")
+        raise Exception( f"There are seperating triangles \n {len(l3_cycles)} three cycles ?= {m - n + 1}, where m={m}, n={n}")
 
 
 def check_triangulated_interior(G):

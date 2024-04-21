@@ -12,8 +12,6 @@ from icecream import ic
 
 
 
-
-
 def vector_between_points(pt1:sp.Point, pt2:sp.Point):
     x, y = (pt1.x - pt2.x, pt1.y - pt2.y)
     magnitude = math.sqrt(x**2 + y**2)
@@ -29,8 +27,6 @@ def angle_between_vectors(v, w):
     angle_radians = np.arccos(np.clip(cos_theta, -1.0, 1.0))
     angle_degrees = np.degrees(angle_radians)
     return angle_degrees, angle_radians
-
-
 
 
 

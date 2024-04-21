@@ -1,6 +1,19 @@
 import networkx as nx
 from enum import Enum
+from pprint import pprint
 
+
+#MARK: getting graph info 
+#TODO make augmented networkx classes.. 
+def get_emedding_coords(embed, arr):
+        return [embed[i] for i in arr]
+
+
+def show_graph_attributes(G:nx.Graph):
+    for node, data in G.nodes.data():
+        pprint(f"Node {node}: {data}")
+
+# --- 
 class PointsList:
     def __init__(self, pair:tuple):
         self.x = pair[0]
@@ -77,7 +90,7 @@ class GraphData:
 
         self.boundary: list = boundary
 
-        print(self.corner_node_dict)
+        # print(self.corner_node_dict)
 
     def __repr__(self):
         return f"GraphData{self.__dict__})"
