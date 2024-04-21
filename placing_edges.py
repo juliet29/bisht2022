@@ -27,7 +27,7 @@ b = BoundaryCycle(copy.deepcopy(graph_data))
 locs = FourCompleteLocations(copy.deepcopy(graph_data), f.boundary, f.paths, b.boundary_line_string)
 locs.run()
 
-cm = CrossingMin(locs.data, b.boundary_line_string)
+cm = CrossingMin(copy.deepcopy(locs.data), b.boundary_line_string)
 cm.run()
 
 

@@ -91,7 +91,7 @@ class CrossingMin:
         dist_along = self.guiding_circle.line_locate_point(pt)
         pt_on_circle = self.guiding_circle.line_interpolate_point(dist_along) # TODO this is a behavior that is repeated with buffer, so should make a function .. 
 
-        # adjust poistion in graph embedding 
+        # adjust poistion in graph embedding  # TODO take action here.. 
         curr_node = self.crossing_edges[self.index][edge_node_ix]
         self.embed[curr_node] = np.array((pt_on_circle.x, pt_on_circle.y))
 

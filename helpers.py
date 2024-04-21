@@ -1,14 +1,12 @@
 from helpers_classes import *
+from helpers_auto_graphs import *
 from helpers_plots import *
-
 
 import inspect
 from itertools import tee
 from collections import OrderedDict
 import math 
 import copy
-
-
 
 from icecream import ic
 import numpy as np
@@ -17,36 +15,6 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import shapely as sp
 
-
-def quick_plotly_plot(x,y, label="None", mode="markers"):
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x, y=y, name=label, mode=mode, ))
-    return fig
-
-def add_geom_to_plotly(geom, fig, label="None", mode="markers"):
-    x, y = points_to_plot(geom.coords)
-    fig.add_trace(go.Scatter(x=x, y=y, name=label,  mode=mode, ))
-    return fig
-     
-def add_embedding_to_plotly(embed, fig=None):
-    if not fig:
-        fig = go.Figure()
-
-    x = [v[0] for v in embed.values()]
-    y = [v[1] for v in embed.values()]
-    keys = [k for k in embed.keys()]
-
-    for ix, k in enumerate(keys):
-        fig.add_trace(go.Scatter(
-            x=[x[ix]], 
-            y=[y[ix]], 
-            name=k, mode="markers", 
-            hovertext=[f"{k}, ({np.round(x[ix],3), np.round(y[ix],3)})"],
-            hoverinfo="text",     
-            marker=dict(color="blue", opacity=0.4, size=10)
-        ))
-
-    return fig
 
 
 def vector_between_points(pt1:sp.Point, pt2:sp.Point):
@@ -66,19 +34,7 @@ def angle_between_vectors(v, w):
     return angle_degrees, angle_radians
 
 
-def get_emedding_coords(embed, arr):
-        return [embed[i] for i in arr]
 
-
-def show_graph_attributes(G:nx.Graph):
-    for node, data in G.nodes.data():
-        pprint(f"Node {node}: {data}")
-
-
-def points_to_plot(coords):
-    x = [c[0] for c in coords]
-    y  = [c[1] for c in coords]
-    return x, y
 
 
 def get_index_by_cardinal_direction(key, corner_node_dict):
