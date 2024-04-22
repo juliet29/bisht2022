@@ -8,16 +8,24 @@ from canonical_order_node import *
 
 from boundary_cycle import *
 
+# NOTE: canonical order is indexed 1,2,... while nodes are indexed 0,1,2, ... 
 
 class KantCanonicalOrder:
-    def __init__(self, GraphData: GraphData) -> None:
+    def __init__(self, GraphData:GraphData) -> None:
+        self.data = GraphData
         self.G = GraphData.G
         self.embed = GraphData.embed
         self.corner_node_dict = GraphData.corner_node_dict
         self.order = None
         self.diff_graph_state = {}
-        # NOTE: canonical order is indexed 1,2,... while nodes are indexed 0,1,2, ... 
+
         self.vn = len(self.G.nodes) - 1
+        
+        self.run()
+
+    def run(self):
+        self.initialize_order()
+        self.finish_order()
 
 
     def initialize_order(self):
@@ -33,7 +41,7 @@ class KantCanonicalOrder:
         # cardinal updates
         for number in list(range(2)):
             node_index = get_index_by_cardinal_direction(CardinalDirections(number), self.corner_node_dict) 
-            self.G.nodes[node_index]["data"].order = number + 1
+            self.G.nodes[node_index]["data"].order = number 
 
         # update last node
         self.G.nodes[self.vn]["data"].visited = 2
@@ -42,21 +50,14 @@ class KantCanonicalOrder:
         for i in range(len(self.G.nodes)):
             for node_index in self.G.nodes:
                 if self.check_vertex_criteria(node_index): #3.1
-                    ic(node_index)
-                    data = self.get_node_data(node_index)
-                    data.update_mark()
-                    
-                    ic(self.vn)
-                    data.add_node_to_order(self.vn)
+                    self.update_node(node_index)
                     self.update_vn()
-                    if self.vn <=2:
-                        break
-
+                    
+                    if self.vn < 2:
+                        ic(f"vn in loop {self.vn}")
+                        return
                     self.update_neighbors(node_index)
                     break
-
-    def update_vn(self):
-        self.vn-=1
 
     def check_vertex_criteria(self, node_index):
         data = self.get_node_data(node_index)
@@ -66,10 +67,20 @@ class KantCanonicalOrder:
                 if data.chords == 0:
                     if data.order != 1 and data.order != 2:
                         return True
+                    
+    def update_node(self, node_index):
+        # ic(node_index)
+        data = self.get_node_data(node_index)
+        data.update_mark()
+        data.add_node_to_order(self.vn)
+
+    def update_vn(self):
+        # ic(f"updated vn: {self.vn}")
+        self.vn-=1
 
     def update_neighbors(self, node_index):
         valid_nbs = [nb for nb in self.G.neighbors(self.vn) if self.get_node_data(nb).mark == False]
-        ic(valid_nbs)
+        # ic(valid_nbs)
         for nb in valid_nbs: #3.2
             data = self.get_node_data(nb)
             data.update_visited()

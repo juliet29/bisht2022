@@ -7,7 +7,6 @@ import numpy as np
 
 
 
-
 #MARK: plotting graphs 
 def plot_planar(G, old_pos=None, hide_ticks=True):
     # ic(old_pos)
