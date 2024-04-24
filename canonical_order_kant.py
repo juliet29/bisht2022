@@ -127,5 +127,27 @@ class KantCanonicalOrder:
         return data
     
 
+    def split_graph_by_ordered(k):
+        ordered_nodes = []
+        remaining_nodes = []
+        for node_index in self.G.nodes:
+            if self.get_node_data(node_index).order < k:
+                ordered_nodes.append(node_index)
+            elif self.get_node_data(node_index).order > k:
+                remaining_nodes.append(node_index)
+        
+        curr_node = list(set.difference(set(self.G.nodes), set(remaining_nodes+ordered_nodes)))
+
+        assert len(curr_node) == 1, "more than one current node :/"
+
+        curr_node = curr_node[0]
+        curr_edges = [e for e in list(self.G.edges) if curr_node in e]
+
+        G_remain = nx.subgraph(self.G, remaining_nodes)
+        G_ordered = nx.subgraph(self.G, ordered_nodes)
+        # G_curr = nx.subgraph(self.G, list(curr_node))
+
+        return G_remain, G_ordered, curr_node, curr_edges
+
 
     

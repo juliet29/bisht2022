@@ -6,6 +6,8 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 import shapely as sp
 
+import numpy as np
+
 def quick_plotly_plot(x,y, label="None", mode="markers"):
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=x, y=y, name=label, mode=mode, ))
@@ -41,3 +43,13 @@ def points_to_plot(coords):
     x = [c[0] for c in coords]
     y  = [c[1] for c in coords]
     return x, y
+
+
+def get_ax(ix, n_rows, n_cols):
+    assert n_rows == 2
+    # todo adjust for more rows
+    row, col = 0,0
+    if ix > (n_cols-1):
+        row = 1
+    col = ix%n_cols
+    return row, col
