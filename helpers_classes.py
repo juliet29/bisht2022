@@ -15,6 +15,7 @@ def get_emedding_coords_as_tuple(embed, arr):
 def show_graph_attributes(G:nx.Graph):
     for node, data in G.nodes.data():
         pprint(f"Node {node}: {data}")
+        
 
 # --- 
 class PointsList:
