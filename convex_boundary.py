@@ -1,5 +1,6 @@
 from helpers import *
 from graph_checks import *
+from itertools import cycle
 
 
 class ConvexBoundary:
@@ -8,7 +9,7 @@ class ConvexBoundary:
         self.G = GraphData.G
         self.embed = GraphData.embed
 
-        # self.run()
+        self.run()
 
     def run(self):
         check_triangulated_interior(self.G)
@@ -18,6 +19,7 @@ class ConvexBoundary:
         self.get_points()
         self.get_exterior_nodes()
         self.get_exterior_cycle()
+        self.get_exterior_cycle_edges()
 
 
 
@@ -50,25 +52,33 @@ class ConvexBoundary:
 
     def get_exterior_cycle(self):
         self.G_ext = nx.subgraph(self.G, self.ext_nodes)
-        cycles = [g for g in nx.simple_cycles(cb.G_ext._graph) if len(g) == len(self.ext_nodes)]
+        cycles = [g for g in nx.simple_cycles(self.G_ext._graph) if len(g) == len(self.ext_nodes)]
 
-        assert len(cycles) > 1, "No cycles found with the correct length"
+        assert len(cycles) >= 1, "No cycles found with the correct length"
 
-        true_cycle  = None
+        self.cycle  = None
         for c in cycles:
             if self.check_ext_nodes_in_cycle(c):
-                true_cycle = c
-                ic(c)
+                self.cycle = c
                 break
-        assert true_cycle, "True cycle was not found"
 
-        def check_ext_nodes_in_cycle(self, cycle):
-            for n in cb.ext_nodes:
-                if n not in cycle:
-                    ic(n)
-                    return
-                # ic(cycles[2])
-            return True
+        assert self.cycle, "True cycle was not found"
+
+    def get_exterior_cycle_edges(self):
+        cycled_cycle = cycle(self.cycle)
+        self.cycle_edges = []
+        for ix, pair in enumerate(pairwise(cycled_cycle)):
+            self.cycle_edges.append(pair)
+            if ix >= len(self.cycle) -1:
+                break
+
+
+    def check_ext_nodes_in_cycle(self, cycle):
+        for n in self.ext_nodes:
+            if n not in cycle:
+                return
+            # ic(cycles[2])
+        return True
 
         # try:
         #     self.cycle_edges = nx.find_cycle(self.G_ext, self.ext_nodes[0])
