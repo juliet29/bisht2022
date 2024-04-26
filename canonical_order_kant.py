@@ -110,7 +110,7 @@ class KantCanonicalOrder:
                 ic(f"updating chords for  {node_index} to {num_chords}")
                 self.get_node_data(node_index).update_chords(num_chords)
             
-            if len(nbs)  == 0 and self.get_node_data(node_index).chords != 0:
+            if len(nbs) == 2 and self.get_node_data(node_index).chords != 0:
                 # only want to do this if num_chords was previously not 0 .. 
                 ic(f"{node_index} has no chords")
                 self.get_node_data(node_index).update_chords(0)
