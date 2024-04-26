@@ -36,6 +36,11 @@ def check_4_conencted(G):
     assert nx.is_k_edge_connected(G, 4), "not 4 connected"
 
 
+def test_biconnect(G):
+        artic_points =  len(list(nx.articulation_points(G))) 
+        assert artic_points == 0, f"not biconnected - articulation points =  {artic_points} "
+
+
 
 # helpers
 def check_shared_neighbour(G, e):

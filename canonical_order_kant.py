@@ -7,6 +7,7 @@ from four_complete_locations import *
 from canonical_order_node import *
 
 from boundary_cycle import *
+from convex_boundary import *
 
 # NOTE: canonical order is indexed 1,2,... while nodes are indexed 0,1,2, ... 
 
@@ -18,10 +19,11 @@ class KantCanonicalOrder:
         self.corner_node_dict = GraphData.corner_node_dict
         self.order = None
         self.diff_graph_state = {}
+        self.ordered_nodes = []
 
-        self.vn = len(self.G.nodes) - 1
+        self.vk = len(self.G.nodes) - 1
         
-        self.run()
+        # self.run()
 
     def run(self):
         self.initialize_order()
@@ -38,26 +40,34 @@ class KantCanonicalOrder:
 
 
     def update_starting_nodes(self):
-        # cardinal updates
+        # cardinal updates - south and east 
         for number in list(range(2)):
             node_index = get_index_by_cardinal_direction(CardinalDirections(number), self.corner_node_dict) 
             self.G.nodes[node_index]["data"].order = number 
 
-        # update last node
-        self.G.nodes[self.vn]["data"].visited = 2
+        # update north node - 
+        node_index = get_index_by_cardinal_direction(CardinalDirections.NORTH, self.corner_node_dict) 
+        self.G.nodes[node_index]["data"].visited = 2
 
     def finish_order(self):
         for i in range(len(self.G.nodes)):
-            for node_index in self.G.nodes:
-                if self.check_vertex_criteria(node_index): #3.1
-                    self.update_node(node_index)
-                    self.update_vn()
-                    
-                    if self.vn < 2:
-                        ic(f"vn in loop {self.vn}")
-                        return
-                    self.update_neighbors(node_index)
-                    break
+            self.order_next_node()
+
+    def order_next_node(self):
+        for node_index in self.G.nodes:
+            if self.check_vertex_criteria(node_index): #3.1
+                self.current_node_index = node_index
+                
+                self.update_node(self.current_node_index)
+                self.ordered_nodes.append(self.current_node_index)
+
+                self.update_vk()
+                
+                if self.vk < 2:
+                    ic(f"finished running - vk in loop {self.vk}")
+                    return
+                self.update_neighbors(self.current_node_index)
+                break
 
     def check_vertex_criteria(self, node_index):
         data = self.get_node_data(node_index)
@@ -65,34 +75,31 @@ class KantCanonicalOrder:
             if data.visited >= 2:
                 # ic(f"{node_index} has >= 2 visited")
                 if data.chords == 0:
-                    if data.order != 1 and data.order != 2:
+                    if data.order != 0 and data.order != 1:
                         return True
                     
     def update_node(self, node_index):
+        # TODO clean this up so that not holding on to data at this point // 
         # ic(node_index)
         data = self.get_node_data(node_index)
         data.update_mark()
-        data.add_node_to_order(self.vn)
+        data.add_node_to_order(self.vk)
 
-    def update_vn(self):
-        # ic(f"updated vn: {self.vn}")
-        self.vn-=1
+    def update_vk(self):
+        # ic(f"updated vk: {self.vk}")
+        self.vk-=1
 
     def update_neighbors(self, node_index):
-        valid_nbs = [nb for nb in self.G.neighbors(self.vn) if self.get_node_data(nb).mark == False]
+        valid_nbs = [nb for nb in self.G.neighbors(self.vk) if self.get_node_data(nb).mark == False]
         # ic(valid_nbs)
         for nb in valid_nbs: #3.2
             data = self.get_node_data(nb)
             data.update_visited()
         
-        G_chord_analysis = self.get_chord_analysis_graph()
+        self.G_chord_analysis = self.get_chord_analysis_graph()
         for node in valid_nbs + [node_index]: # 3.3
-            self.check_and_update_chords(G_chord_analysis, node)
+            self.check_and_update_chords(self.G_chord_analysis, node)
     
-    def get_chord_analysis_graph(self, ):
-        G_diff = self.get_unmarked_graph()
-        G_ext = self.get_exterior_graph(G_diff)
-        return G_ext
     
     def check_and_update_chords(self, G_chord_analysis, node_index):
         if node_index in G_chord_analysis.nodes:
@@ -102,6 +109,10 @@ class KantCanonicalOrder:
                 ic(f"updating chords for {node_index} to {num_chords}")
                 self.get_node_data(node_index).update_chords(num_chords)
 
+    def get_chord_analysis_graph(self, ):
+        G_diff = self.get_unmarked_graph()
+        self.G_ext = self.get_exterior_graph(G_diff)
+        return self.G_ext
 
     def get_unmarked_graph(self, ):
         marked_nodes = []
@@ -116,9 +127,10 @@ class KantCanonicalOrder:
 
     def get_exterior_graph(self, G_diff):
         temp_graph_data  = GraphData(G_diff, self.embed)
-        b = BoundaryCycle(temp_graph_data, CONVEX_APPROACH=True)
-        exterior_nodes = b.ccw_boundary_cycle
-        G_ext = nx.subgraph(self.G, exterior_nodes)        
+        b = ConvexBoundary(temp_graph_data)
+        # b = BoundaryCycle(temp_graph_data, CONVEX_APPROACH=True)
+        # exterior_nodes = b.ccw_boundary_cycle
+        G_ext = nx.subgraph(self.G, b.cycle)        
         return G_ext
        
 
@@ -127,7 +139,8 @@ class KantCanonicalOrder:
         return data
     
 
-    def split_graph_by_ordered(k):
+    def split_graph_by_ordered(self, k):
+        # for checking while going forward ! 
         ordered_nodes = []
         remaining_nodes = []
         for node_index in self.G.nodes:
