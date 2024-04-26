@@ -8,6 +8,7 @@ from canonical_order_node import *
 
 from boundary_cycle import *
 from convex_boundary import *
+from canonical_order_checks import CanonicalOrderChecks
 
 # NOTE: canonical order is indexed 1,2,... while nodes are indexed 0,1,2, ... 
 
@@ -20,6 +21,7 @@ class KantCanonicalOrder:
         self.order = None
         self.diff_graph_state = {}
         self.ordered_nodes = []
+        self.unordered_nodes = list(self.G.nodes)
 
         self.vk = len(self.G.nodes) - 1
         
@@ -54,52 +56,57 @@ class KantCanonicalOrder:
             self.order_next_node()
 
     def order_next_node(self):
-        for node_index in self.G.nodes:
+        for node_index in self.G.nodes: # could search only in unordered nodes 
             if self.check_vertex_criteria(node_index): #3.1
                 self.current_node_index = node_index
-                
                 self.update_node(self.current_node_index)
-                self.ordered_nodes.append(self.current_node_index)
-
-                self.update_vk()
                 
-                if self.vk < 2:
-                    ic(f"finished running - vk in loop {self.vk}")
+                if self.vk == 2:
+                    ic(f"completed order - vk == {self.vk}")
                     return
+                
                 self.update_neighbors(self.current_node_index)
+                self.update_tracker()
+                self.check_conditions()
+            
+                self.update_vk()
                 break
+
 
     def check_vertex_criteria(self, node_index):
         data = self.get_node_data(node_index)
         if data.mark == False:
             if data.visited >= 2:
-                # ic(f"{node_index} has >= 2 visited")
                 if data.chords == 0:
                     if data.order != 0 and data.order != 1:
                         return True
                     
     def update_node(self, node_index):
-        # TODO clean this up so that not holding on to data at this point // 
-        # ic(node_index)
         data = self.get_node_data(node_index)
         data.update_mark()
         data.add_node_to_order(self.vk)
 
     def update_vk(self):
-        # ic(f"updated vk: {self.vk}")
         self.vk-=1
 
     def update_neighbors(self, node_index):
-        # TODO seems kind of redundant => only unmarked nbs will be in G_unmarked_ext => which is basically the unmarked graph.. 
         valid_nbs = [nb for nb in self.G.neighbors(self.current_node_index) if self.get_node_data(nb).mark == False]
-        # ic(valid_nbs)
+
         for nb in valid_nbs: #3.2
             data = self.get_node_data(nb)
             data.update_visited()
         
         self.get_unmarked_exterior_graph()
-        for node in valid_nbs + [node_index]: # 3.3
+        for node in valid_nbs: # 3.3
             self.check_and_update_chords(node)
+
+    def update_tracker(self):
+        self.ordered_nodes.append(self.current_node_index)
+        self.unordered_nodes.remove(self.current_node_index)
+
+    def check_conditions(self):
+        self.coc = CanonicalOrderChecks(self)
+        self.coc.check_conditions()
 
 
     def check_and_update_chords(self, node_index):
@@ -112,15 +119,13 @@ class KantCanonicalOrder:
             
             if len(nbs) == 2 and self.get_node_data(node_index).chords != 0:
                 # only want to do this if num_chords was previously not 0 .. 
-                ic(f"{node_index} has no chords")
+                ic(f"{node_index} has no more chords")
                 self.get_node_data(node_index).update_chords(0)
-    
     
 
     def get_unmarked_exterior_graph(self, ):
         self.get_unmarked_graph()
         self.get_exterior_graph()
-        return self.G_unmarked_ext
 
     def get_unmarked_graph(self, ):
         marked_nodes = []
@@ -128,28 +133,22 @@ class KantCanonicalOrder:
             data = self.get_node_data(node_index)
             if data.mark == True:
                 marked_nodes.append(node_index)
-        ic(marked_nodes)
 
         unmarked_nodes = set(self.G.nodes).difference(set(marked_nodes))
-        ic(unmarked_nodes)
         self.G_unmarked = nx.subgraph(self.G, unmarked_nodes)
 
     def get_exterior_graph(self):
         temp_graph_data  = GraphData(self.G_unmarked, self.embed)
         self.cb = ConvexBoundary(temp_graph_data)
         self.G_unmarked_ext = nx.subgraph(self.G, self.cb.cycle)        
-
        
+    
 
     def get_node_data(self, node_index):
         data:NodeCanonicalOrder = self.G.nodes[node_index]["data"]
         return data
     
-
-
-
-
-
+    
 
 
     # for plotting 
