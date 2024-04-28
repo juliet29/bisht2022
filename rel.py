@@ -22,6 +22,7 @@ class RegularEdgeLabeling:
         self.corner_edges = all_correct
 
     def color_corner_nodes(self):
+        # TODO should be coloring edges not nodes!!!
         for v in self.corner_node_data.values():
             if v.name in [CardinalDirections.SOUTH, CardinalDirections.NORTH]:
                 self.rel.nodes[v.index]["node"] = "T_blue"

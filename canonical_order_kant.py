@@ -20,7 +20,7 @@ class KantCanonicalOrder:
         self.G = GraphData.G
         self.embed = GraphData.embed
         self.corner_node_dict = GraphData.corner_node_dict
-        self.order = None
+        
         self.ordered_nodes = []
         self.unordered_nodes = list(self.G.nodes)
         self.rel_helper = {}
