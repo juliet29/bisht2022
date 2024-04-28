@@ -14,7 +14,12 @@ def get_emedding_coords_as_tuple(embed, arr):
 
 def show_graph_attributes(G:nx.Graph):
     for node, data in G.nodes.data():
-        pprint(f"Node {node}: {data}")
+        if data:
+            pprint(f"Node {node}: {data}")
+
+    for e1, e2, data in G.edges.data():
+        if data:
+            pprint(f"Edge {e1, e2}: {data}")
         
 
 # --- 
@@ -98,6 +103,9 @@ class GraphData:
 
     def __repr__(self):
         return f"GraphData{self.__dict__})"
+    
+
+
 
 
 class ListHistoryTracker:
