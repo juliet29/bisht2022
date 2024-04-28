@@ -15,17 +15,12 @@ class CanonicalOrderChecks:
         self.co = co
 
     def check_conditions(self):
-        self.get_Gk_1()
         self.check_biconnected()
         self.check_nb_conditions()
 
-    
-    def get_Gk_1(self):
-        self.Gk_minus = nx.subgraph(self.co.G, self.co.unordered_nodes)
-        self.Gk_minus_boundary = ConvexBoundary(GraphData(self.Gk_minus, self.co.embed))
 
     def check_biconnected(self):
-        test_biconnect(self.Gk_minus)
+        test_biconnect(self.co.G_unmarked)
 
     
     def check_nb_conditions(self):
@@ -53,7 +48,7 @@ class CanonicalOrderChecks:
 
     def check_sufficient_unordered_nbs(self):
         # check nbs are in boundary of Gk_minus
-        a, b = freeze_list_of_tuples(self.G_unordered_nb.edges, self.Gk_minus_boundary.cycle_edges)
+        a, b = freeze_list_of_tuples(self.G_unordered_nb.edges, self.co.boundary_unmarked.cycle_edges)
         overlapping_edges = a.intersection(b)
         assert len(list(overlapping_edges)) == len(self.G_unordered_nb.edges), "Neighbours not in outer boundary"
 

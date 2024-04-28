@@ -10,6 +10,8 @@ from boundary_cycle import *
 from convex_boundary import *
 from canonical_order_checks import CanonicalOrderChecks
 
+from graph_checks import NotTriangulatedError
+
 # NOTE: canonical order is indexed 1,2,... while nodes are indexed 0,1,2, ... 
 
 class KantCanonicalOrder:
@@ -19,9 +21,9 @@ class KantCanonicalOrder:
         self.embed = GraphData.embed
         self.corner_node_dict = GraphData.corner_node_dict
         self.order = None
-        self.diff_graph_state = {}
         self.ordered_nodes = []
         self.unordered_nodes = list(self.G.nodes)
+        self.rel_helper = {}
 
         self.vk = len(self.G.nodes) - 1
         
@@ -40,7 +42,6 @@ class KantCanonicalOrder:
         for node_index in self.G.nodes:
             self.G.nodes[node_index]["data"] = NodeCanonicalOrder(index=node_index)
 
-
     def update_starting_nodes(self):
         # cardinal updates - south and east 
         for number in list(range(2)):
@@ -54,22 +55,26 @@ class KantCanonicalOrder:
     def finish_order(self):
         for i in range(len(self.G.nodes)):
             self.order_next_node()
+            if self.vk ==  1:
+                ic(f"completed order - vk == {self.vk}")
+                break
 
     def order_next_node(self):
-        for node_index in self.G.nodes: # could search only in unordered nodes 
+        for node_index in self.G.nodes: # TODO could search only in unordered nodes 
             if self.check_vertex_criteria(node_index): #3.1
                 self.current_node_index = node_index
                 self.update_node(self.current_node_index)
                 
-                if self.vk == 2:
-                    ic(f"completed order - vk == {self.vk}")
-                    return
-                
-                self.update_neighbors(self.current_node_index)
                 self.update_tracker()
-                self.check_conditions()
+                self.update_neighbors(self.current_node_index)
+                self.update_rel_helper()
+
+                if self.G_unmarked_ext:
+                    self.check_conditions()
             
                 self.update_vk()
+
+                # operate on only one node each round
                 break
 
 
@@ -96,9 +101,12 @@ class KantCanonicalOrder:
             data = self.get_node_data(nb)
             data.update_visited()
         
-        self.get_unmarked_exterior_graph()
-        for node in valid_nbs: # 3.3
-            self.check_and_update_chords(node)
+        self.get_exterior_graphs()
+
+        if self.G_unmarked_ext:
+            for node in valid_nbs: # 3.3
+                self.check_and_update_chords(node)
+
 
     def update_tracker(self):
         self.ordered_nodes.append(self.current_node_index)
@@ -123,26 +131,39 @@ class KantCanonicalOrder:
                 self.get_node_data(node_index).update_chords(0)
     
 
-    def get_unmarked_exterior_graph(self, ):
-        self.get_unmarked_graph()
-        self.get_exterior_graph()
+    def get_exterior_graphs(self, ):
+        self.differentate_graph()
+        self.get_exterior_unmarked_graph()
+        self.get_exterior_marked_graph()
 
-    def get_unmarked_graph(self, ):
-        marked_nodes = []
-        for node_index in self.G.nodes:
-            data = self.get_node_data(node_index)
-            if data.mark == True:
-                marked_nodes.append(node_index)
+    def differentate_graph(self):
+        self.G_unmarked = nx.subgraph(self.G, self.unordered_nodes)
+        # dont want to include current node 
+        self.G_marked = nx.subgraph(self.G, self.ordered_nodes[0:-1])
 
-        unmarked_nodes = set(self.G.nodes).difference(set(marked_nodes))
-        self.G_unmarked = nx.subgraph(self.G, unmarked_nodes)
+    def get_exterior_unmarked_graph(self):
+        try:
+            self.boundary_unmarked = ConvexBoundary(GraphData(self.G_unmarked, self.embed))
+            self.unordered_cycle = copy.deepcopy(self.boundary_unmarked.cycle)
+            self.G_unmarked_ext = nx.subgraph(self.G, self.boundary_unmarked.cycle)  
+            
+        except NotTriangulatedError: 
+            ic(f"ISSUE  FINDING UNMARKED CYCLE when vk = {self.vk}")
+            self.unordered_cycle = []
+            self.G_unmarked_ext = None
+            
 
-    def get_exterior_graph(self):
-        temp_graph_data  = GraphData(self.G_unmarked, self.embed)
-        self.cb = ConvexBoundary(temp_graph_data)
-        self.G_unmarked_ext = nx.subgraph(self.G, self.cb.cycle)        
-       
-    
+    def get_exterior_marked_graph(self):
+        try:
+            self.boundary_marked = ConvexBoundary(GraphData(self.G_marked, self.embed))
+            self.ordered_cycle = copy.deepcopy(self.boundary_marked.cycle)
+        except:
+            self.ordered_cycle = []
+
+
+    def update_rel_helper(self):
+        self.rel_helper[self.vk] = {"unordered_boundary": self.unordered_cycle , "ordered_boundary": self.ordered_cycle}
+
 
     def get_node_data(self, node_index):
         data:NodeCanonicalOrder = self.G.nodes[node_index]["data"]

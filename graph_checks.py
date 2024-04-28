@@ -26,7 +26,7 @@ def check_seperating_triangle(G):
 def check_triangulated_interior(G):
     for e in G.edges:
         if not check_shared_neighbour(G, e):
-            raise Exception("Interior is not triangulated")
+            raise NotTriangulatedError()
     return 
 
 def check_triangulated_chordal(G):
@@ -50,3 +50,7 @@ def check_shared_neighbour(G, e):
             # ic((node,v), (node,u))
             return True
     return False
+
+
+class NotTriangulatedError(Exception):
+    pass

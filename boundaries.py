@@ -28,7 +28,7 @@ class Boundaries:
         self.distinguish_corner_nodes()
 
     def find_boundary_points(self):
-        embed_arr = np.array([self.embed[key] for key in sorted(self.embed.keys())])
+        embed_arr = np.aroray([self.embed[key] for key in sorted(self.embed.keys())])
         indices = np.arange(len(embed_arr))
 
         hull = ConvexHull(embed_arr)
