@@ -38,6 +38,21 @@ class REL2:
         self.G_no_corner_connect = copy.deepcopy(self.co.G)
         self.G_no_corner_connect.remove_edges_from(edges_to_ignore)
 
+    def find_valid_nbs(self, order, boundary="unordered_boundary"):
+        curr_node_index = self.get_node_index_by_order(order)
+        curr_nbs = self.get_node_nbs(curr_node_index)
+
+        boundary_list = self.co.rel_helper[order][boundary]
+
+        valid_nbs = []
+
+        for node in boundary_list:
+            if node in curr_nbs:
+                valid_nbs.append(node)
+
+        return valids_nbs
+
+
 
     def create_mapping(self):
         self.order_map = {} 
