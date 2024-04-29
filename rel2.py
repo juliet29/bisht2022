@@ -1,7 +1,9 @@
 from canonical_order_kant import KantCanonicalOrder
 from edge_label import EdgeLabeling, EdgeColorings
-from helpers import nx, plt, ic
+from helpers import nx, plt, ic, copy
 from helpers_classes import show_graph_attributes
+from rel_interior import RELInterior
+from rel_corners import RELCorners
 
 
 
@@ -9,59 +11,38 @@ class REL2:
     def __init__(self, co:KantCanonicalOrder) -> None:
         self.co = co
 
-        self.create_mapping()
-        self.rel = nx.DiGraph()
-        self.curr_order = 2
+        self.G_rel = nx.DiGraph()
         self.edge_split = {EdgeColorings(0): [], EdgeColorings(1): []}
 
-    def step_rel(self):
-        self.get_ordered_nbs()
-        self.update_outgoing_edges()
-        self.update_edge_split()
-        ic(self.curr_node_index, self.curr_order)
-        self.curr_order+=1
-        
-        pass
+        self.remove_corner_connections()
+        self.create_mapping()
+
+        self.RELCorners = RELCorners(self)
+        self.RELInterior = RELInterior(self)
+
+    def order_corners(self):
+        self.RELCorners.order_all_corners()
+
+    def step_order_interior(self):
+        self.RELInterior.step_rel()
+
+    def remove_corner_connections(self):
+        # TODO seems like should be a higher level attribute .. 
+        self.corner_nodes = [v.index for v in self.co.corner_node_dict.values()] 
+        edges_to_ignore = []
+        for e in self.co.G.edges:
+            if e[0] in self.corner_nodes and e[1] in self.corner_nodes:
+                edges_to_ignore.append(e)
 
 
-    def get_ordered_nbs(self):
-        self.curr_node_index = self.get_node_index_by_order(self.curr_order)
-        curr_nbs = self.get_node_nbs(self.curr_node_index)
-
-        ordered_boundary = self.co.rel_helper[self.curr_order]["ordered_boundary"]
-
-        self.ordered_nbs = []
-        # for nb in curr_nbs:
-        #     if nb in ordered_boundary:
-        #         self.ordered_nbs.append(nb)
-        for node in ordered_boundary:
-            if node in curr_nbs:
-                self.ordered_nbs.append(node)
-
-        assert len(self.ordered_nbs) >= 2, f"Not enough nbs of {self.curr_node_index} have been ordered: NBs={curr_nbs}, Ordered NBs = {self.ordered_nbs}"
-    
-    def update_outgoing_edges(self):
-        self.left_edge = (self.curr_node_index, self.ordered_nbs[0])
-        self.right_edge = (self.curr_node_index, self.ordered_nbs[-1])
-     
-        attrs = {
-        self.left_edge: {"data": EdgeLabeling(0)},
-        self.right_edge: {"data": EdgeLabeling(1)},
-        }
-
-        self.rel.add_edges_from([self.left_edge, self.right_edge])
-        nx.set_edge_attributes(self.rel, attrs)
-
-
-    def update_edge_split(self):
-        self.edge_split[EdgeColorings(0)].append(self.left_edge)
-        self.edge_split[EdgeColorings(1)].append(self.right_edge)
+        self.G_no_corner_connect = copy.deepcopy(self.co.G)
+        self.G_no_corner_connect.remove_edges_from(edges_to_ignore)
 
 
     def create_mapping(self):
         self.order_map = {} 
         self.index_map = {}
-        for i in self.co.G.nodes.data():
+        for i in self.G_no_corner_connect.nodes.data():
             order = i[1]["data"].order
             index = i[0]
             self.order_map[order] = index
@@ -74,12 +55,13 @@ class REL2:
         return self.index_map[node_index]
 
     def get_node_nbs(self, node_index):
-        return [n for n in nx.neighbors(self.co.G, node_index)]
+        return [n for n in nx.neighbors(self.G_no_corner_connect, node_index)]
     
     def show_graph_data(self):
-        show_graph_attributes(self.rel)
+        show_graph_attributes(self.G_rel)
 
     def plot_graph(self):
+        # NOTE: plotting with corner connections, even though not ordering with them 
         self.fig, self.axs = plt.subplots(figsize=[6,5])
         nx.draw_networkx(self.co.G, pos=self.co.embed, ax=self.axs)
 
@@ -88,12 +70,12 @@ class REL2:
         plt.show()
 
 
-
     def plot_egdes_by_color(self, side):
         color = BLUE_COLOR if side == 0 else RED_COLOR
         edges = self.edge_split[EdgeColorings(side)]
+        ic(edges)
 
-        nx.draw_networkx_edges(self.rel, pos=self.co.embed, ax=self.axs, edgelist=edges, edge_color=color, width=EDGE_WIDTH, arrows=True)
+        nx.draw_networkx_edges(self.G_rel, pos=self.co.embed, ax=self.axs, edgelist=edges, edge_color=color, width=EDGE_WIDTH, arrows=True)
 
 
 
