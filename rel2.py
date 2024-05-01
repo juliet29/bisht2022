@@ -4,6 +4,7 @@ from helpers import nx, plt, ic, copy
 from helpers_classes import show_graph_attributes
 from rel_interior import RELInterior
 from rel_corners import RELCorners
+from rel_base_edge import RELBaseEdge
 
 
 
@@ -17,14 +18,19 @@ class REL2:
         self.remove_corner_connections()
         self.create_mapping()
 
+        self.RELBaseEdge = RELBaseEdge(self)
         self.RELCorners = RELCorners(self)
         self.RELInterior = RELInterior(self)
+
+    def step_order_base_edge(self):
+        self.RELBaseEdge.step_base_edge_connnections()
 
     def order_corners(self):
         self.RELCorners.order_all_corners()
 
     def step_order_interior(self):
         self.RELInterior.step_rel()
+
 
     def remove_corner_connections(self):
         # TODO seems like should be a higher level attribute .. 
@@ -49,8 +55,9 @@ class REL2:
         for node in boundary_list:
             if node in curr_nbs:
                 valid_nbs.append(node)
+        
 
-        return valids_nbs
+        return valid_nbs
 
 
 
