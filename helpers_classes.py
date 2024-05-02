@@ -1,7 +1,7 @@
 import networkx as nx
 from enum import Enum
 from pprint import pprint
-
+from shapely import Point
 
 #MARK: getting graph info 
 #TODO make augmented networkx classes.. 
@@ -10,6 +10,10 @@ def get_emedding_coords(embed, arr):
 
 def get_emedding_coords_as_tuple(embed, arr):
         return [tuple(embed[i]) for i in arr]
+
+
+def get_emedding_coords_as_point(embed, arr):
+        return [Point(tuple(embed[i])) for i in arr]
 
 
 def show_graph_attributes(G:nx.Graph):
