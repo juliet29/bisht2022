@@ -6,6 +6,7 @@ class Faces:
         self.data = GraphData
         self.G = GraphData.G
         self.embedding = embedding
+        self.starting_node = 0
 
     def create_edge_list(self):
         self.all_edges = []
@@ -49,11 +50,18 @@ class Faces:
             if cntr == 7:
                 break
 
+    def get_starting_edge(self):
+        
+        for e in self.embedding[self.starting_node]:
+            if e in self.available_edges:
+                ic("starting edge", e)
+                return e
+
 
     def make_face(self):
         assert self.available_edges, f"No avail edges: {self.available_edges}"
 
-        curr_edge = self.available_edges[0]
+        curr_edge = self.get_starting_edge()
         face = [curr_edge]
         self.available_edges.remove(curr_edge)
 
@@ -68,6 +76,7 @@ class Faces:
             if next_edge[1] == face[0][0]:
                 face.append(next_edge)
                 self.face = face
+                self.starting_node+=1
                 return
    
             else:
@@ -83,12 +92,14 @@ class Faces:
 
     def get_next_edge(self, curr_edge):
         assert self.available_edges, f"No avail edges: {self.available_edges}"
-        cw_edges = self.embedding[curr_edge[1]]
+        self.cw_edges = self.embedding[curr_edge[1]]
+        
+        self.potential_edges = []
+        for e in self.cw_edges:
+            if e in self.available_edges:
+                self.potential_edges.append(e)
 
-
-        potential_edges = list(set(cw_edges).intersection(set(self.available_edges)))
-
-        for potential_edge in potential_edges:
+        for potential_edge in self.potential_edges:
             if potential_edge[0] == curr_edge[1]:
                     if potential_edge[1] != curr_edge[0]:
                         return potential_edge
