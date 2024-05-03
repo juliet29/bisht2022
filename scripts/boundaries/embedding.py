@@ -14,7 +14,6 @@ class Embedding:
         for node in self.G.nodes:
             self.get_node_embedding(node)
 
-        
 
     def get_node_embedding(self, node=0):
         self.curr_node = node
@@ -28,14 +27,13 @@ class Embedding:
 
         
     def ccw_order(self):
-
         # Calculate the angle between each coordinate and the self.curr_node_coord
         self.angles = [
             (self.calc_angles_complex(pt), node) for node, pt in zip(self.nbs, self.nb_coords)
         ]
 
         # Sort the coordinates based on the angles
-        self.sorted_nodes = sorted(self.angles)
+        self.sorted_nodes = sorted(self.angles, reverse=False)
 
         # Extract the sorted coordinates without the angles
         self.ccw_ordered_nodes = [node for angle, node in self.sorted_nodes]
@@ -45,12 +43,12 @@ class Embedding:
         self.half_edges[self.curr_node] = [(self.curr_node, n) for n in self.ccw_ordered_nodes]
 
 
-    def calc_angles_simple(self, point):
-        angle = math.atan2(point.y - self.curr_node_coord.y, point.x - self.curr_node_coord.x)
-        return angle
+
                            
 
     def calc_angles_complex(self, point):
+        # ref: https://stackoverflow.com/questions/41855695/sorting-list-of-two-dimensional-coordinates-by-clockwise-angle-using-python/41856340#41856340
+
         point = [point.x, point.y]
         origin = [self.curr_node_coord.x, self.curr_node_coord.y]
         refvec = [0, 1]
@@ -68,7 +66,6 @@ class Embedding:
         diffprod = refvec[1]*normalized[0] - refvec[0]*normalized[1]     # x1*y2 - y1*x2
         angle = math.atan2(diffprod, dotprod)
         # Negative angles represent counter-clockwise angles so we need to subtract them from 2*pi (360 degrees)
-        
 
         if angle < 0:
             return 2*math.pi+angle
