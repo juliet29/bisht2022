@@ -6,7 +6,8 @@ class Faces:
         self.data = GraphData
         self.G = GraphData.G
         self.embedding = embedding
-        self.starting_node = 0
+        self.starting_index = 0
+        self.node_order = [g for g in nx.dfs_preorder_nodes(self.G)]
 
     def create_edge_list(self):
         self.all_edges = []
@@ -51,7 +52,7 @@ class Faces:
                 break
 
     def get_starting_edge(self):
-        
+        self.starting_node = self.node_order[self.starting_index]
         for e in self.embedding[self.starting_node]:
             if e in self.available_edges:
                 ic("starting edge", e)
@@ -76,7 +77,7 @@ class Faces:
             if next_edge[1] == face[0][0]:
                 face.append(next_edge)
                 self.face = face
-                self.starting_node+=1
+                self.starting_index+=1
                 return
    
             else:
