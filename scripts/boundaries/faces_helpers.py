@@ -33,16 +33,14 @@ class FacesBaseClass:
         if len(self.mutated_embedding[self.focus_vertex]) == 0:
             self.focus_vertex += 1
 
-    def update_current_edge(self):
+    def update_face(self):
+        self.face.append(self.next_edge)
         self.curr_edge = self.next_edge
-        self.face.append(self.curr_edge)
-        # self.add_edge_to_current_face(edge)
 
     def inititialize_face(self):
         self.face_start = self.get_edge(embed=self.mutated_embedding, edge_index=0)
         self.face.append(self.face_start)
         self.curr_edge = self.face_start
-
 
     def check_face_complete(self):
         if self.face[0][0] == self.face[-1][1]:
@@ -62,7 +60,6 @@ class FacesBaseClass:
     def check_counter(self):
         if self.counter > 8:
             raise Exception("Too many iterations, no end to this face in sight")
-
 
     def establish_euler_targets(self):
         self.n_nodes = len(self.G.nodes)

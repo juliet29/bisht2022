@@ -1,5 +1,5 @@
 
-from helpers import sp, nx, ic
+from helpers import nx
 import math
 from helpers_classes import get_emedding_coords_as_point
 
@@ -12,39 +12,33 @@ class Embedding:
 
     def get_graph_embedding(self):
         for node in self.G.nodes:
-            self.get_node_embedding(node)
+            self.curr_node = node 
+            self.get_node_embedding()
 
 
-    def get_node_embedding(self, node=0):
-        self.curr_node = node
-        self.curr_node_coord =  get_emedding_coords_as_point(self.embed, [self.curr_node])[0]
-
-        self.nbs =  [n for n in nx.neighbors(self.G, self.curr_node)]
-        self.nb_coords = get_emedding_coords_as_point(self.embed, self.nbs)
-
+    def get_node_embedding(self):
+        self.create_coords_for_node()
         self.ccw_order()
         self.create_half_edges()
 
+    def create_coords_for_node(self):
+        self.curr_node_coord =  get_emedding_coords_as_point(self.embed, [self.curr_node])[0]
+        self.nbs =  [n for n in nx.neighbors(self.G, self.curr_node)]
+        self.nb_coords = get_emedding_coords_as_point(self.embed, self.nbs)
+
         
     def ccw_order(self):
-        # Calculate the angle between each coordinate and the self.curr_node_coord
         self.angles = [
             (self.calc_angles_complex(pt), node) for node, pt in zip(self.nbs, self.nb_coords)
         ]
 
-        # Sort the coordinates based on the angles
         self.sorted_nodes = sorted(self.angles, reverse=True)
-
-        # Extract the sorted coordinates without the angles
         self.ccw_ordered_nodes = [node for angle, node in self.sorted_nodes]
 
 
     def create_half_edges(self):
         self.half_edges[self.curr_node] = [(self.curr_node, n) for n in self.ccw_ordered_nodes]
-
-
-
-                           
+   
 
     def calc_angles_complex(self, point):
         # ref: https://stackoverflow.com/questions/41855695/sorting-list-of-two-dimensional-coordinates-by-clockwise-angle-using-python/41856340#41856340

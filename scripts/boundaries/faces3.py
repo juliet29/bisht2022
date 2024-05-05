@@ -27,7 +27,6 @@ class Faces(FacesBaseClass):
             self.faces_counter += 1
             self.check_faces_counter()
 
-
     def finish_face(self):
         self.counter = 0
         while True:
@@ -51,7 +50,6 @@ class Faces(FacesBaseClass):
         self.inititialize_face()
         self.outer_face_bool = True
 
-
     def find_next_edge(self):
         self.start_node, self.end_node = self.curr_edge
         self.end_node_nbs = self.get_nbs(
@@ -66,7 +64,7 @@ class Faces(FacesBaseClass):
         self.next_edge = self.get_edge(
             embed=self.preserved_embedding, edge_index=self.ix_next, node=self.end_node
         )
-        self.update_current_edge()
+        self.update_face()
 
     def find_next_edge_outer_face(self):
         self.start_node, self.end_node = self.curr_edge
@@ -75,7 +73,7 @@ class Faces(FacesBaseClass):
         self.next_edge = self.get_edge(
             embed=self.mutated_embedding, edge_index=0, node=self.end_node
         )
-        self.update_current_edge()
+        self.update_face()
 
     def find_next_edge_based_on_end_nb(self):
         self.ix_next = self.end_node_nbs.index(self.face_end_nb)
