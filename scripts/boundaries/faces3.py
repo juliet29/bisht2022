@@ -14,8 +14,6 @@ class Faces:
         self.target_vertex = 2
         self.focus_vertex = 0
 
-        self.counter = 0
-
         self.faces = []
         self.face = []
 
@@ -29,6 +27,24 @@ class Faces:
         self.available_embedding = deepcopy(self.embedding)
         self.remove_source_target_edges()
 
+    def finish_faces(self):
+        self.faces_counter = 0
+        while True:
+            self.update_focus_vertex()
+            self.start_face()
+            self.finish_face()
+
+            if self.check_euler():
+                break
+
+            self.faces_counter+=1
+            ic(self.faces_counter)
+            if self.faces_counter > 8:
+                break 
+
+    def update_focus_vertex(self):
+        if len(self.available_embedding[self.focus_vertex]) == 0:
+            self.focus_vertex+=1
 
     def start_face(self):
         self.face_start = self.get_edge(edge_index=0)
@@ -41,6 +57,7 @@ class Faces:
         ic(self.face_start, self.face_end, self.face_end_nb)
 
     def finish_face(self):
+        self.counter = 0
         while True:
             if self.check_face_complete():
                 self.handle_face_complete()
@@ -70,21 +87,6 @@ class Faces:
         self.add_edge_to_current_face(self.curr_edge)
 
 
-    def check_face_complete(self):
-        if self.face[0][0] == self.face[-1][1]:
-            ic("completed face")
-            return True 
-        
-    def handle_face_complete(self):
-        self.faces.append(self.face)
-        ic(self.faces)
-        for e in self.face:
-            self.available_edges.remove(e)
-            self.available_embedding[e[0]].remove(e)
-
-        self.face = []
-
-
     def find_next_edge_based_on_end_nb(self):
         ic("the end is near!")
         self.ix_next = self.end_node_nbs.index(self.face_end_nb)
@@ -99,12 +101,24 @@ class Faces:
         else:
             self.ix_next = len(self.end_node_nbs) - 1
         
-
-        
-    
         
     def add_edge_to_current_face(self, edge):
         self.face.append(edge)
+
+
+    def check_face_complete(self):
+        if self.face[0][0] == self.face[-1][1]:
+            ic("completed face")
+            return True 
+        
+    def handle_face_complete(self):
+        self.faces.append(self.face)
+        ic(self.faces)
+        for e in self.face:
+            self.available_edges.remove(e)
+            self.available_embedding[e[0]].remove(e)
+
+        self.face = []
         
 
     def remove_source_target_edges(self):
@@ -129,14 +143,15 @@ class Faces:
 
 
 
-
     def check_euler(self):
         self.n_nodes = len(self.G.nodes)
         self.n_edges = len(self.G.edges)
         self.n_faces = len(self.faces)
         
-        self.correct_balance = self.n_edges - self.n_nodes  + 2 == self.n_faces
-        if self.correct_balance: 
+        # TODO temp -1 because just doing inner faces! 
+        self.correct_balance = self.n_edges - self.n_nodes  + 2 -1 == self.n_faces
+        if self.correct_balance:
+            ic("euler balance complete!") 
             return True
         else:
             return False
