@@ -33,7 +33,7 @@ class Embedding:
         ]
 
         # Sort the coordinates based on the angles
-        self.sorted_nodes = sorted(self.angles, reverse=False)
+        self.sorted_nodes = sorted(self.angles, reverse=True)
 
         # Extract the sorted coordinates without the angles
         self.ccw_ordered_nodes = [node for angle, node in self.sorted_nodes]
@@ -51,7 +51,9 @@ class Embedding:
 
         point = [point.x, point.y]
         origin = [self.curr_node_coord.x, self.curr_node_coord.y]
-        refvec = [0, 1]
+        # refvec = [0, 1] # noon 
+        refvec = [-1, 0] #9pm 
+        refvec = [1, 0] #3pm  for ccw
 
         # Vector between point and the origin: v = p - o
         vector = [point[0]-origin[0], point[1]-origin[1]]

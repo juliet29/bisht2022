@@ -68,14 +68,6 @@ class Faces:
 
 
 
-
-
-
-
-
-
-
-
     def get_edge(self, edge_index):
         return self.embedding[self.focus_vertex][edge_index]
 
