@@ -10,3 +10,4 @@ def update_path():
     sys.path.insert(0, "../scripts/graph_generators/")
     sys.path.insert(0, "../scripts/helpers")
     sys.path.insert(0, "../scripts/rel")
+    sys.path.insert(0, "../scripts/dual")
