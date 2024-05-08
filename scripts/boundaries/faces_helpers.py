@@ -78,7 +78,6 @@ class FacesBaseClass:
 
     def check_total_goal(self):
         if self.total_faces_goal == len(self.faces):
-            ic(self.faces)
             return True
 
     def create_embedding_versions(self):

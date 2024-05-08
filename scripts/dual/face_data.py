@@ -1,7 +1,7 @@
 class FaceData:
-    def __init__(self) -> None:
-        self.left_face = []
-        self.right_face = []
+    def __init__(self, left=None, right=None) -> None:
+        self.left_face = left
+        self.right_face = right
 
     def __repr__(self):
         return f"FaceData({self.__dict__})"

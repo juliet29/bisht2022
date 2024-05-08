@@ -31,6 +31,9 @@ class VertexFaceMatch:
     def run(self):
         self.match_vertices()
 
+    def prepare_vertex_faces(self):
+        self.vertex_faces = {k: FaceData() for k in self.G.nodes}
+
     def match_vertices(self):
         for vertex in self.G.nodes:
             if vertex != self.source_vertex and vertex != self.target_vertex:
@@ -60,6 +63,7 @@ class VertexFaceMatch:
             self.order[ix].append(EdgeDirection.OUT)
 
     def check_full_order(self):
+        # need two faces, with and in and out label for each 
         self.valid_order = {k: v for k, v in self.order.items() if len(v) == 2}
 
         if len(self.valid_order.keys()) == 2:
@@ -97,5 +101,4 @@ class VertexFaceMatch:
                     new_face.append(e)
             self.new_faces.append(new_face)
 
-    def prepare_vertex_faces(self):
-        self.vertex_faces = {k: FaceData() for k in self.G.nodes}
+    
