@@ -28,15 +28,17 @@ class Dual:
         em.get_graph_embedding()
 
         fa = Faces(self.graph_data, em.half_edges)
-        vf = VertexFaceMatch(self.digraph_data, fa.faces)
-        ef = EdgeFaceMatch(self.digraph_data, fa.faces)
-
         fa.find_faces()
+
+        vf = VertexFaceMatch(self.digraph_data, fa.faces)
         vf.run()
+
+        ef = EdgeFaceMatch(self.digraph_data, fa.faces)
         ef.run()
 
         self.faces = fa.faces
         self.face_dict = {k:v for k,v in enumerate(self.faces)}
+        
         self.vertex_faces = vf.vertex_faces
         self.edge_faces = ef.edge_faces
 
@@ -63,15 +65,10 @@ class Dual:
     def create_dual_edges(self):
         self.simplify_edge_faces()
         self.edges = list(self.tuple_edge_faces.values())
-        # 4 is technically east, anf 5 is west 
+        # 4 is technically west, anf 5 is east 
         for ix, e in enumerate(self.edges):
             if e == (5,4):
                 self.edges[ix] = (4,5)
-
-    def create_dual_graph(self):
-        G = nx.DiGraph()
-        G.add_edges_from(self.edges)
-        self.DualGraphData = GraphData(G,embed=self.face_locs )
 
     def simplify_edge_faces(self):
         self.tuple_edge_faces = {}
@@ -80,9 +77,22 @@ class Dual:
             r = self.get_face_ix(v.right_face)
             self.tuple_edge_faces[k] = (l, r)
 
+
     def get_face_ix(self, face):
         return get_key_by_value(self.face_dict, face)
 
 
+    def create_dual_graph(self):
+        G = nx.DiGraph()
+        G.add_edges_from(self.edges)
+        self.DualGraphData = GraphData(G,embed=self.face_locs)
         
 
+
+    def simplify_vertex_faces(self):
+        self.tuple_vertex_faces = {}
+        for k,v in self.vertex_faces.items():
+            if v.left_face and v.right_face:
+                l = self.get_face_ix(v.left_face)
+                r = self.get_face_ix(v.right_face)
+                self.tuple_vertex_faces[k] = (l, r)
