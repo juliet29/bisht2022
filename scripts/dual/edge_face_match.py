@@ -1,5 +1,4 @@
 from helpers import nx
-from angles import calc_angles_complex
 from face_data import FaceData
 
 
@@ -10,8 +9,9 @@ class EdgeFaceMatch:
         self.faces = faces
         self.curr_edge = None
 
-    def run(self):
         self.prepare_edge_faces()
+
+    def run(self):
         self.match_all_edges()
     
     def prepare_edge_faces(self):
