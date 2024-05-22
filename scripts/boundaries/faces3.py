@@ -1,4 +1,4 @@
-from faces_helpers import FacesBaseClass
+from faces_base import FacesBaseClass
 
 
 class Faces(FacesBaseClass):
