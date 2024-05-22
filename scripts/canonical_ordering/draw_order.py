@@ -5,6 +5,15 @@ class DrawCanonicalOrder:
     def __init__(self, co:KantCanonicalOrder) -> None:
         self.co = co
 
+    def start(self):
+        self.co.initialize_order()
+        init_nodes, labels = self.get_init_nodes()
+        nx.draw_networkx(self.co.G, self.co.embed, nodelist=init_nodes, node_color="#5d7f14", labels=labels)
+
+    def next_step(self):
+        self.co.order_next_node()
+        nodes, labels = self.get_relev_nodes()
+        nx.draw_networkx(self.co.G, self.co.embed, nodelist=nodes, node_color="#5d7f14", labels=labels)
 
     def get_node_labels(self, node_list):
             labels = {}
@@ -22,7 +31,6 @@ class DrawCanonicalOrder:
         return init_nodes, labels
 
     def get_relev_nodes(self):
-        
         relev_nodes = []
         for node_index in self.co.G.nodes:
             if self.co.get_node_data(node_index).order != -99:
@@ -31,13 +39,3 @@ class DrawCanonicalOrder:
         labels = self.get_node_labels(relev_nodes)
         return relev_nodes, labels
     
-    def start(self):
-        self.co.initialize_order()
-        init_nodes, labels = self.get_init_nodes()
-        nx.draw_networkx(self.co.G, self.co.embed, nodelist=init_nodes, node_color="#5d7f14", labels=labels)
-
-    def next_step(self):
-        self.co.order_next_node()
-
-        nodes, labels = self.get_relev_nodes()
-        nx.draw_networkx(self.co.G, self.co.embed, nodelist=nodes, node_color="#5d7f14", labels=labels)
