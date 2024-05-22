@@ -1,4 +1,6 @@
-from helpers import *
+from helpers import nx, euclidean_distance
+
+from helpers_classes import GraphData, get_emedding_coords
 
 import shapely as sp
 import copy 

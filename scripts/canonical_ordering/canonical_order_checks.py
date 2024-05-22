@@ -1,4 +1,4 @@
-from helpers import *
+from helpers import nx
 from augment import *
 
 from helpers_classes import *
@@ -7,7 +7,9 @@ from four_complete_locations import *
 from canonical_order_node import *
 
 from convex_boundary import *
+from graph_checks import test_biconnect
 
+from list_and_dict_utils import freeze_list_of_tuples
 # NOTE: canonical order is indexed 1,2,... while nodes are indexed 0,1,2, ... 
 
 class CanonicalOrderChecks:

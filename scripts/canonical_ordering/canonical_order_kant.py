@@ -1,18 +1,19 @@
-from helpers import *
+from helpers import nx, get_index_by_cardinal_direction, ic
 from augment import *
+import copy
 
-from helpers_classes import *
+from helpers_classes import GraphData, CardinalDirections
 
 from four_complete_locations import *
 from canonical_order_node import *
 
 from boundary_cycle import *
-from convex_boundary import *
+from convex_boundary import ConvexBoundary
 from canonical_order_checks import CanonicalOrderChecks
 
 from graph_checks import NotTriangulatedError
 
-# NOTE: canonical order is indexed 1,2,... while nodes are indexed 0,1,2, ... 
+
 
 class KantCanonicalOrder:
     def __init__(self, GraphData:GraphData) -> None:
@@ -172,29 +173,3 @@ class KantCanonicalOrder:
     
 
 
-    # for plotting 
-    def split_graph_by_ordered(self, k):
-        # for checking while going forward ! 
-        ordered_nodes = []
-        remaining_nodes = []
-        for node_index in self.G.nodes:
-            if self.get_node_data(node_index).order < k:
-                ordered_nodes.append(node_index)
-            elif self.get_node_data(node_index).order > k:
-                remaining_nodes.append(node_index)
-        
-        curr_node = list(set.difference(set(self.G.nodes), set(remaining_nodes+ordered_nodes)))
-
-        assert len(curr_node) == 1, "more than one current node :/"
-
-        curr_node = curr_node[0]
-        curr_edges = [e for e in list(self.G.edges) if curr_node in e]
-
-        G_remain = nx.subgraph(self.G, remaining_nodes)
-        G_ordered = nx.subgraph(self.G, ordered_nodes)
-        # G_curr = nx.subgraph(self.G, list(curr_node))
-
-        return G_remain, G_ordered, curr_node, curr_edges
-
-
-    
