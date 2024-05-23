@@ -1,6 +1,11 @@
+import matplotlib.pyplot as plt
+from copy import deepcopy
+import networkx as nx
+
 from canonical_order_kant import KantCanonicalOrder
 from edge_label import EdgeLabeling, EdgeColorings
-from helpers import nx, plt, ic, copy
+
+from helpers import ic
 from helpers_classes import show_graph_attributes
 from rel_interior import RELInterior
 from rel_corners import RELCorners
@@ -22,14 +27,41 @@ class REL2:
         self.RELCorners = RELCorners(self)
         self.RELInterior = RELInterior(self)
 
-    def step_order_base_edge(self):
-        self.RELBaseEdge.step_base_edge_connnections()
+    def create_REL(self):
+        self.order_corners()
+        n_goal_edges = len(self.G_no_corner_connect.edges)
+        cntr = 0
+        while True:
+            self.step_order_base_edge()
+            if len(self.G_rel.edges) >= n_goal_edges:
+                ic("ending, sufficient edges")
+                self.split_REL()
+                break
+
+            cntr+=1
+            if cntr > n_goal_edges:
+                raise Exception("too many iterations, not enough edges")
+            
 
     def order_corners(self):
         self.RELCorners.order_all_corners()
 
-    def step_order_interior(self):
-        self.RELInterior.step_rel()
+    def step_order_base_edge(self):
+        self.RELBaseEdge.step_base_edge_connnections()
+            
+    def split_REL(self):
+        self.G_blue = nx.DiGraph(self.edge_split[EdgeColorings.LEFT_BLUE])
+        self.check_st_graph(self.G_blue)
+
+        self.G_red = nx.DiGraph(self.edge_split[EdgeColorings.RIGHT_RED])
+        self.check_st_graph(self.G_red)
+
+    def check_st_graph(self, G):
+        sources = [x for x in G.nodes() if G.out_degree(x)>0 and G.in_degree(x)==0]
+        targets = [x for x in G.nodes() if G.out_degree(x)==0 and G.in_degree(x)>0]
+        assert len(sources) == 1, f"# source nodes != 1, {sources}"
+        assert len(targets) == 1, f"# target nodes != 1, {targets}"
+
 
 
     def remove_corner_connections(self):
@@ -41,7 +73,7 @@ class REL2:
                 edges_to_ignore.append(e)
 
 
-        self.G_no_corner_connect = copy.deepcopy(self.co.G)
+        self.G_no_corner_connect = deepcopy(self.co.G)
         self.G_no_corner_connect.remove_edges_from(edges_to_ignore)
 
     def find_valid_nbs(self, order, boundary="unordered_boundary"):
@@ -94,10 +126,10 @@ class REL2:
 
     def plot_egdes_by_color(self, side):
         color = BLUE_COLOR if side == 0 else RED_COLOR
+        width = EDGE_WIDTH*2 if side ==0 else EDGE_WIDTH
         edges = self.edge_split[EdgeColorings(side)]
-        ic(edges)
 
-        nx.draw_networkx_edges(self.G_rel, pos=self.co.embed, ax=self.axs, edgelist=edges, edge_color=color, width=EDGE_WIDTH, arrows=True)
+        nx.draw_networkx_edges(self.G_rel, pos=self.co.embed, ax=self.axs, edgelist=edges, edge_color=color, width=width, arrows=True)
 
 
 

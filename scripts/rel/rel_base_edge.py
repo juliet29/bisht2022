@@ -8,18 +8,26 @@ class RELBaseEdge:
         self.REL = REL
         self.curr_order =  list(self.REL.co.rel_helper.keys())[1]
 
+
     def step_base_edge_connnections(self):
+        self.skip = False
         self.create_incoming_edges()
-        self.find_base_edge()
-        self.assign_colors()
+        if self.skip == False:
+            self.find_base_edge()
+            self.assign_colors()
         self.curr_order-=1
 
         
     def create_incoming_edges(self):
         self.curr_node = self.REL.get_node_index_by_order(self.curr_order)
+        if self.curr_node in self.REL.corner_nodes:
+            ic(f"skipping {self.curr_node} bc it is a corner node")
+            self.skip = True
+            return 
         self.valid_nbs = self.REL.find_valid_nbs(self.curr_order)
+        ic(self.curr_node, self.valid_nbs)
 
-        assert len(self.valid_nbs) > 0, f"No valid nbs for {self.curr_node_index}"
+        assert len(self.valid_nbs) > 0, f"No valid nbs for {self.curr_node}"
 
         self.edges = [(nb, self.curr_node) for nb in self.valid_nbs]
 

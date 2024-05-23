@@ -1,4 +1,4 @@
-from helpers import copy, nx
+from helpers import nx
 from edge_label import EdgeLabeling, EdgeColorings
 from helpers_classes import CardinalDirections
 

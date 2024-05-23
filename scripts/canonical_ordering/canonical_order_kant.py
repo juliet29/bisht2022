@@ -51,7 +51,6 @@ class KantCanonicalOrder(CanonicalOrderBaseClass):
             if data.visited >= 2:
                 if data.chords == 0:
                     if data.order != 0 and data.order != 1:
-                        print("selected node", node_index)
                         return True
                     
 

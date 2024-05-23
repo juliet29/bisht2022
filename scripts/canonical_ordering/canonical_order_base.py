@@ -66,9 +66,7 @@ class CanonicalOrderBaseClass:
 
     def get_nbs_of_last_2_ordered_nodes(self):
         last_order, second_to_last_order = self.get_last_2_ordered()
-        ic(last_order, second_to_last_order)
         self.nbs_of_last_2_ordered = list(set(self.ordered_nbs[last_order][1]).intersection(set(self.ordered_nbs[second_to_last_order][1])))
-        ic(self.nbs_of_last_2_ordered)
 
     
 
@@ -124,6 +122,8 @@ class CanonicalOrderBaseClass:
             
         except NotTriangulatedError: 
             ic(f"ISSUE  FINDING UNMARKED CYCLE when vk = {self.vk}")
+            if self.vk==2:
+                ic("Since vk=2, lack of unmarked cycle is not a problem, graph has been sufficiently ordered.")
             self.unordered_cycle = []
             self.G_unmarked_ext = None
             
