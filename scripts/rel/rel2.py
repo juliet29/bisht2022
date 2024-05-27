@@ -7,6 +7,7 @@ from edge_label import EdgeLabeling, EdgeColorings
 
 from helpers import ic
 from helpers_classes import show_graph_attributes
+from stgraph_data import  STGraphData
 from rel_interior import RELInterior
 from rel_corners import RELCorners
 from rel_base_edge import RELBaseEdge
@@ -51,16 +52,19 @@ class REL2:
             
     def split_REL(self):
         self.G_blue = nx.DiGraph(self.edge_split[EdgeColorings.LEFT_BLUE])
-        self.check_st_graph(self.G_blue)
+        s, t = self.check_st_graph(self.G_blue)
+        self.vertical_st = STGraphData(self.G_blue, self.co.embed, s, t)
 
         self.G_red = nx.DiGraph(self.edge_split[EdgeColorings.RIGHT_RED])
-        self.check_st_graph(self.G_red)
+        s,t = self.check_st_graph(self.G_red)
+        self.horizontal_st = STGraphData(self.G_red, self.co.embed, s, t)
 
     def check_st_graph(self, G):
         sources = [x for x in G.nodes() if G.out_degree(x)>0 and G.in_degree(x)==0]
         targets = [x for x in G.nodes() if G.out_degree(x)==0 and G.in_degree(x)>0]
         assert len(sources) == 1, f"# source nodes != 1, {sources}"
         assert len(targets) == 1, f"# target nodes != 1, {targets}"
+        return sources[0], targets[0] 
 
 
 
@@ -87,7 +91,6 @@ class REL2:
         for node in boundary_list:
             if node in curr_nbs:
                 valid_nbs.append(node)
-        
 
         return valid_nbs
 

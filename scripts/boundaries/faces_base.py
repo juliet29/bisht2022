@@ -1,18 +1,20 @@
 from helpers import ic
+from stgraph_data import STGraphData
+
 from copy import deepcopy
 
 
 class FacesBaseClass:
-    def __init__(self, GraphData, embedding) -> None:
-        self.data = GraphData
-        self.G = GraphData.G
-        self.embedding = embedding
+    def __init__(self, STGraphData:STGraphData) -> None:
+        self.data = STGraphData
+        self.G = STGraphData.G
+        self.embedding = STGraphData.embedding
 
         # TODO these should be gotten automatically
         # TODO update for graphs that are not st..
-        self.source_vertex = 0
-        self.target_vertex = 2
-        self.focus_vertex = 0
+        self.source_vertex = STGraphData.source
+        self.target_vertex = STGraphData.target
+        self.focus_vertex = STGraphData.source
 
         self.faces = []
         self.face = []
@@ -30,7 +32,7 @@ class FacesBaseClass:
         return [v[1] for v in embed[focus_node]]
 
     def update_focus_vertex(self):
-        if len(self.mutated_embedding[self.focus_vertex]) == 0:
+        if len(self.mutated_embedding[self.focus_vertex]) <= 1:
             self.focus_vertex += 1
 
     def update_face(self):
@@ -47,6 +49,7 @@ class FacesBaseClass:
             return True
 
     def handle_face_complete(self):
+        ic(f"handling face completion .. for {self.face} ")
         self.faces.append(self.face)
         for e in self.face:
             self.mutated_embedding[e[0]].remove(e)

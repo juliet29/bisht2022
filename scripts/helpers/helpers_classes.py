@@ -108,28 +108,8 @@ class GraphData:
     def __repr__(self):
         return f"GraphData{self.__dict__})"
     
-
-
-
-
-class ListHistoryTracker:
-    def __init__(self, lst):
-        self.history = [[]]  # Initialize with an empty list as the initial state
-        self.current_state = lst[:]  # Make a copy of the initial list
-        self.history.append(self.current_state)  # Append the initial state to history
-
-    def append(self, item):
-        self.current_state.append(item)
-        self._update_history()
-
-    def _update_history(self):
-        self.history.append(self.current_state[:])
-
-    def get_history(self):
-        return self.history
-
-
-
-
     
+    
+
+
 
