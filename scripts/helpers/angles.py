@@ -58,6 +58,9 @@ def angle_from_dot_product(origin:sp.Point, a:sp.Point, b:sp.Point):
     quotient = dot_prod/scalar_prod
     angle = math.acos(quotient)
 
+    # diff_prod = refvec.y*unit_vector.x - refvec.x*unit_vector.y
+    # cross_prod = vec_b.y*vec_a.x - vec_b.x*vec_a.y
+
     return angle
 
 def calc_vector_and_mag(origin, pt):
@@ -70,37 +73,36 @@ def calc_vector_and_mag(origin, pt):
 
 def create_unit_vector(vector):
     # Length of vector: ||v||
-    lenvector = math.hypot(vector[0], vector[1])
+    lenvector = math.hypot(vector.x, vector.y)
     # If length is zero there is no angle
     if lenvector == 0:
         raise Exception("vector has length of 0")
     # Normalize vector: v/||v||
-    unit_vector = sp.Point([vector[0]/lenvector, vector[1]/lenvector])
+    unit_vector = sp.Point([vector.x/lenvector, vector.y/lenvector])
 
     return unit_vector
 
 def convert_neg_angle(angle):
     return 2*math.pi+angle
 
-def calc_angle_between_two_points(origin:sp.Point, point:sp.Point):
-    ic(point)
-    refvec = sp.Point([1, 0]) #3pm  for ccw
-    vector = [point.x - origin.x, point.y - origin.y]
+def calc_tangent_angle_between_two_points(origin:sp.Point, point:sp.Point):
+    # ic(point)
+    # refvec = sp.Point([1, 0]) #3pm  for ccw
+    vector = sp.Point([point.x - origin.x, point.y - origin.y])
     unit_vector = create_unit_vector(vector)
 
+    # assumption is that refvec is (1,0), so angle represents traversal around unit circle
     simple_angle = math.atan2(unit_vector.y, unit_vector.x)
-    ic(simple_angle)
     if simple_angle < 0:
         ic("negative simple angle")
         simple_angle = convert_neg_angle(simple_angle)
-        ic(simple_angle)
 
-    dot_prod = unit_vector.x*refvec.x + unit_vector.y*refvec.y
-    diff_prod = refvec.y*unit_vector.x - refvec.x*unit_vector.y
-    complex_angle = math.atan2(diff_prod, dot_prod)
-    ic(complex_angle)
+    # dot_prod = unit_vector.x*refvec.x + unit_vector.y*refvec.y
+    # diff_prod = refvec.y*unit_vector.x - refvec.x*unit_vector.y
+    # complex_angle = math.atan2(diff_prod, dot_prod)
+    # ic(complex_angle)
 
-    return simple_angle, complex_angle
+    return simple_angle
     
 
 
