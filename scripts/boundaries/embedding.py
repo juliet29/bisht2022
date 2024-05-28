@@ -2,7 +2,7 @@
 from helpers import nx
 import math
 from helpers_classes import get_emedding_coords_as_point
-from angles import calc_angles_complex
+from angles import calc_angle_between_two_points
 
 class Embedding:
     def __init__(self, GraphData) -> None:
